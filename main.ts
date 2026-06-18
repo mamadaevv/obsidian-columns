@@ -4,8 +4,6 @@ import {
   BasesAllOptions,
   BasesEntry,
   QueryController,
-  HoverParent,
-  HoverPopover,
   TFile,
   WorkspaceLeaf,
   Menu,
@@ -54,9 +52,8 @@ export default class ColumnsPlugin extends Plugin {
 //  Columns View
 // ---------------------------------------------------------------------------
 
-class ColumnsView extends BasesView implements HoverParent {
+class ColumnsView extends BasesView {
   type = "columns";
-  hoverPopover: HoverPopover | null = null;
   scrollEl: HTMLElement;
   containerEl: HTMLElement;
   plugin: ColumnsPlugin;
@@ -278,7 +275,7 @@ class ColumnsView extends BasesView implements HoverParent {
 
     // Collect all tags for each file (for AND mode)
     const fileTags = new Map<string, string[]>();
-    for (const [val, colEntries] of columnMap) {
+    for (const [, colEntries] of columnMap) {
       for (const entry of colEntries) {
         const p = entry.file?.path;
         if (!p) continue;
@@ -319,7 +316,6 @@ class ColumnsView extends BasesView implements HoverParent {
         colEntries = noValueEntries.filter(
           (e) => e.file?.path && filteredPaths.includes(e.file.path),
         );
-        if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
         const raw = columnMap.get(colName)!;
         const paths = raw.map((e) => e.file?.path ?? "");
@@ -327,14 +323,6 @@ class ColumnsView extends BasesView implements HoverParent {
         colEntries = raw.filter(
           (e) => e.file?.path && filteredPaths.includes(e.file.path),
         );
-
-        if (this.andMode && this.activeFilters.size > 0) {
-          colEntries = colEntries.filter((e) => {
-            const p = e.file?.path ?? "";
-            const tags = fileTags.get(p) ?? [];
-            return Array.from(this.activeFilters).every((t) => tags.includes(t));
-          });
-        }
       }
 
       if (colEntries.length === 0) continue;

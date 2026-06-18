@@ -51,7 +51,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
   constructor(controller, scrollEl, plugin) {
     super(controller);
     this.type = "columns";
-    this.hoverPopover = null;
     this.activeFilters = /* @__PURE__ */ new Set();
     this.andMode = true;
     this.scrollEl = scrollEl;
@@ -225,7 +224,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
     }
     const fileTags = /* @__PURE__ */ new Map();
-    for (const [val, colEntries] of columnMap) {
+    for (const [, colEntries] of columnMap) {
       for (const entry of colEntries) {
         const p = entry.file?.path;
         if (!p) continue;
@@ -258,7 +257,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
         colEntries = noValueEntries.filter(
           (e) => e.file?.path && filteredPaths.includes(e.file.path)
         );
-        if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
         const raw = columnMap.get(colName);
         const paths = raw.map((e) => e.file?.path ?? "");
@@ -266,13 +264,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
         colEntries = raw.filter(
           (e) => e.file?.path && filteredPaths.includes(e.file.path)
         );
-        if (this.andMode && this.activeFilters.size > 0) {
-          colEntries = colEntries.filter((e) => {
-            const p = e.file?.path ?? "";
-            const tags = fileTags.get(p) ?? [];
-            return Array.from(this.activeFilters).every((t) => tags.includes(t));
-          });
-        }
       }
       if (colEntries.length === 0) continue;
       this.renderColumn(boardEl, colName, colEntries, colWidth, visibleProps);
@@ -338,12 +329,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const title = this.getCardTitle(file);
     titleEl.textContent = title;
     for (const propId of visibleProps) {
-      const val = entry.getValue(propId);
-      if (!val || val.isTruthy() === false) continue;
+      const val2 = entry.getValue(propId);
+      if (!val2 || val2.isTruthy() === false) continue;
       const chip = cardEl.createSpan({ cls: "columns-card-chip" });
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = parsed?.name ?? propId;
-      chip.textContent = `${label}: ${val.toString()}`;
+      chip.textContent = `${label}: ${val2.toString()}`;
     }
     cardEl.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -360,9 +351,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const prop = this.getTitleProperty();
     if (!prop) return file.basename;
     const cache = this.app.metadataCache.getFileCache(file);
-    const val = cache?.frontmatter?.[prop];
-    if (typeof val === "string") return val;
-    if (typeof val === "number") return String(val);
+    const val2 = cache?.frontmatter?.[prop];
+    if (typeof val2 === "string") return val2;
+    if (typeof val2 === "number") return String(val2);
     return file.basename;
   }
   // -----------------------------------------------------------------------
