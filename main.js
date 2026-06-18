@@ -69,33 +69,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.render();
   }
   // -----------------------------------------------------------------------
-  //  View options (gear menu)
+  //  View options (gear menu — only simple/static settings)
   // -----------------------------------------------------------------------
   static getViewOptions() {
     return [
-      {
-        key: CFG_SOURCE_FOLDER,
-        type: "text",
-        displayName: "Source folder",
-        default: "",
-        placeholder: "e.g. Projects/Notes"
-      },
-      {
-        key: CFG_COLUMN_PROP,
-        type: "dropdown",
-        displayName: "Column property",
-        default: "auto",
-        options: {
-          auto: "Auto-detect",
-          tags: "tags",
-          categories: "categories",
-          type: "type",
-          status: "status",
-          genre: "genre",
-          topic: "topic",
-          priority: "priority"
-        }
-      },
       {
         key: CFG_TITLE_PROP,
         type: "dropdown",
@@ -138,10 +115,21 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const v = this.config?.get(key);
     return v ?? fallback;
   }
+  getSourceFolder() {
+    return this.cfg(CFG_SOURCE_FOLDER, "");
+  }
+  setSourceFolder(path) {
+    this.config?.set(CFG_SOURCE_FOLDER, path);
+    this.render();
+  }
   getColumnProperty() {
     const v = this.cfg(CFG_COLUMN_PROP, "auto");
     if (v === "auto") return this.detectColumnProperty();
     return v;
+  }
+  setColumnProperty(prop) {
+    this.config?.set(CFG_COLUMN_PROP, prop);
+    this.render();
   }
   getTitleProperty() {
     return this.cfg(CFG_TITLE_PROP, "file name");
@@ -182,13 +170,55 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (typeof raw === "number") return [String(raw)];
     return [];
   }
+  /** Scan all frontmatter keys from files in the vault (for property suggester). */
+  getAllFrontmatterKeys() {
+    const keys = /* @__PURE__ */ new Set();
+    for (const file of this.app.vault.getMarkdownFiles()) {
+      const cache = this.app.metadataCache.getFileCache(file);
+      if (cache?.frontmatter) {
+        for (const key of Object.keys(cache.frontmatter)) {
+          keys.add(key);
+        }
+      }
+    }
+    return Array.from(keys).sort();
+  }
+  // -----------------------------------------------------------------------
+  //  Toolbar (folder & property pickers with real data)
+  // -----------------------------------------------------------------------
+  renderToolbar() {
+    const bar = this.containerEl.createDiv({ cls: "columns-toolbar" });
+    const folder = this.getSourceFolder() || "(root)";
+    const folderLabel = bar.createSpan({ cls: "columns-toolbar-label" });
+    folderLabel.createSpan({ cls: "columns-toolbar-icon" }).textContent = "\u{1F4C1}";
+    const folderText = folderLabel.createSpan({ cls: "columns-toolbar-value" });
+    folderText.textContent = folder;
+    folderLabel.addEventListener("click", () => {
+      new FolderSuggestModal(this.app, this.getSourceFolder(), (path) => {
+        this.setSourceFolder(path);
+      }).open();
+    });
+    bar.createSpan({ cls: "columns-toolbar-sep" }).textContent = "\xB7";
+    const colProp = this.getColumnProperty();
+    const colLabel = bar.createSpan({ cls: "columns-toolbar-label" });
+    colLabel.createSpan({ cls: "columns-toolbar-icon" }).textContent = "\u{1F3F7}";
+    const colText = colLabel.createSpan({ cls: "columns-toolbar-value" });
+    colText.textContent = colProp;
+    colLabel.addEventListener("click", () => {
+      new PropertySuggestModal(this.app, colProp, this.getAllFrontmatterKeys(), (prop) => {
+        this.setColumnProperty(prop);
+      }).open();
+    });
+    return bar;
+  }
   // -----------------------------------------------------------------------
   //  Rendering
   // -----------------------------------------------------------------------
   render() {
     this.containerEl.empty();
+    this.renderToolbar();
     const entries = this.data?.entries ?? [];
-    const folder = this.cfg(CFG_SOURCE_FOLDER, "");
+    const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
     const prefix = folder ? folder.endsWith("/") ? folder : folder + "/" : "";
     const filtered = prefix ? entries.filter(
@@ -209,6 +239,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
         }
       }
     }
+    const fileTags = /* @__PURE__ */ new Map();
+    for (const [val, paths] of columnMap) {
+      for (const p of paths) {
+        if (!fileTags.has(p)) fileTags.set(p, []);
+        fileTags.get(p).push(val);
+      }
+    }
     const applyFilters = (paths, allTags) => {
       if (this.activeFilters.size === 0) return paths;
       if (this.andMode) {
@@ -220,13 +257,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
         (p) => allTags.some((t) => this.activeFilters.has(t))
       );
     };
-    const fileTags = /* @__PURE__ */ new Map();
-    for (const [val, paths] of columnMap) {
-      for (const p of paths) {
-        if (!fileTags.has(p)) fileTags.set(p, []);
-        fileTags.get(p).push(val);
-      }
-    }
     this.renderFilterBar(columnMap);
     const colNames = Array.from(columnMap.keys()).sort();
     if (noValueFiles.length > 0) colNames.push("(No value)");
@@ -242,7 +272,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
         if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
         const rawPaths = Array.from(columnMap.get(colName));
-        const tags = fileTags;
         const filteredPaths = applyFilters(rawPaths, rawPaths);
         const entryMap = /* @__PURE__ */ new Map();
         for (const entry of filtered) {
@@ -254,8 +283,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
         }).map((p) => entryMap.get(p)).filter(Boolean);
         if (this.andMode && this.activeFilters.size > 0) {
           colFiles = colFiles.filter((f) => {
-            const tags2 = fileTags.get(f.path) ?? [];
-            return Array.from(this.activeFilters).every((t) => tags2.includes(t));
+            const tags = fileTags.get(f.path) ?? [];
+            return Array.from(this.activeFilters).every((t) => tags.includes(t));
           });
         }
       }
@@ -366,6 +395,60 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
   }
 };
+var FolderSuggestModal = class extends import_obsidian.SuggestModal {
+  constructor(app, current, onChoose) {
+    super(app);
+    this.picked = current;
+    this.onChoose = onChoose;
+    this.setPlaceholder("Type to filter folders\u2026");
+    this.setInstructions([
+      { command: "\u21B5", purpose: "select" },
+      { command: "esc", purpose: "cancel" }
+    ]);
+  }
+  getSuggestions(query) {
+    const folders = this.app.vault.getAllLoadedFiles().filter((f) => f instanceof import_obsidian.TFolder).map((f) => f.path).filter((p) => p !== "").sort();
+    const all = ["", ...folders];
+    if (!query) return all;
+    return all.filter(
+      (p) => (p || "(entire vault)").toLowerCase().includes(query.toLowerCase())
+    );
+  }
+  renderSuggestion(path, el) {
+    el.textContent = path || "(entire vault)";
+  }
+  onChooseSuggestion(path) {
+    this.onChoose(path);
+  }
+};
+var PropertySuggestModal = class extends import_obsidian.SuggestModal {
+  constructor(app, current, allKeys, onChoose) {
+    super(app);
+    this.currentKeys = allKeys;
+    this.onChoose = onChoose;
+    this.setPlaceholder("Type property name or filter\u2026");
+    this.setInstructions([
+      { command: "\u21B5", purpose: "select" },
+      { command: "esc", purpose: "cancel" }
+    ]);
+  }
+  getSuggestions(query) {
+    const presets = PRIORITY_PROPS.map(
+      (p) => `${p} \u2014 auto-detect priority`
+    );
+    const keys = this.currentKeys;
+    const all = [...presets, ...keys];
+    if (!query) return all;
+    return all.filter((k) => k.toLowerCase().includes(query.toLowerCase()));
+  }
+  renderSuggestion(item, el) {
+    el.textContent = item;
+  }
+  onChooseSuggestion(item) {
+    const clean = item.includes(" \u2014 ") ? item.split(" \u2014 ")[0] : item;
+    this.onChoose(clean);
+  }
+};
 var FilePreviewModal = class extends import_obsidian.Modal {
   constructor(app, file) {
     super(app);
@@ -375,7 +458,7 @@ var FilePreviewModal = class extends import_obsidian.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("columns-modal-content");
-    const titleEl = contentEl.createEl("h2", { text: this.file.basename });
+    contentEl.createEl("h2", { text: this.file.basename });
     const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
     this.app.vault.read(this.file).then((text) => {
       import_obsidian.MarkdownRenderer.render(this.app, text, contentDiv, this.file.path, this);

@@ -7,10 +7,13 @@ import {
   HoverParent,
   HoverPopover,
   TFile,
+  TFolder,
   WorkspaceLeaf,
   Menu,
   Modal,
   MarkdownRenderer,
+  SuggestModal,
+  App,
 } from "obsidian";
 
 // ---------------------------------------------------------------------------
@@ -85,34 +88,11 @@ class ColumnsView extends BasesView implements HoverParent {
   }
 
   // -----------------------------------------------------------------------
-  //  View options (gear menu)
+  //  View options (gear menu — only simple/static settings)
   // -----------------------------------------------------------------------
 
   static getViewOptions(): BasesAllOptions[] {
     return [
-      {
-        key: CFG_SOURCE_FOLDER,
-        type: "text",
-        displayName: "Source folder",
-        default: "",
-        placeholder: "e.g. Projects/Notes",
-      },
-      {
-        key: CFG_COLUMN_PROP,
-        type: "dropdown",
-        displayName: "Column property",
-        default: "auto",
-        options: {
-          auto: "Auto-detect",
-          tags: "tags",
-          categories: "categories",
-          type: "type",
-          status: "status",
-          genre: "genre",
-          topic: "topic",
-          priority: "priority",
-        },
-      },
       {
         key: CFG_TITLE_PROP,
         type: "dropdown",
@@ -158,10 +138,24 @@ class ColumnsView extends BasesView implements HoverParent {
     return (v as T) ?? fallback;
   }
 
+  private getSourceFolder(): string {
+    return this.cfg(CFG_SOURCE_FOLDER, "");
+  }
+
+  private setSourceFolder(path: string): void {
+    this.config?.set(CFG_SOURCE_FOLDER, path);
+    this.render();
+  }
+
   private getColumnProperty(): string {
     const v = this.cfg(CFG_COLUMN_PROP, "auto");
     if (v === "auto") return this.detectColumnProperty();
     return v;
+  }
+
+  private setColumnProperty(prop: string): void {
+    this.config?.set(CFG_COLUMN_PROP, prop);
+    this.render();
   }
 
   private getTitleProperty(): string {
@@ -211,6 +205,57 @@ class ColumnsView extends BasesView implements HoverParent {
     return [];
   }
 
+  /** Scan all frontmatter keys from files in the vault (for property suggester). */
+  private getAllFrontmatterKeys(): string[] {
+    const keys = new Set<string>();
+    for (const file of this.app.vault.getMarkdownFiles()) {
+      const cache = this.app.metadataCache.getFileCache(file);
+      if (cache?.frontmatter) {
+        for (const key of Object.keys(cache.frontmatter)) {
+          keys.add(key);
+        }
+      }
+    }
+    return Array.from(keys).sort();
+  }
+
+  // -----------------------------------------------------------------------
+  //  Toolbar (folder & property pickers with real data)
+  // -----------------------------------------------------------------------
+
+  private renderToolbar(): HTMLElement {
+    const bar = this.containerEl.createDiv({ cls: "columns-toolbar" });
+
+    // Folder label
+    const folder = this.getSourceFolder() || "(root)";
+    const folderLabel = bar.createSpan({ cls: "columns-toolbar-label" });
+    folderLabel.createSpan({ cls: "columns-toolbar-icon" }).textContent = "📁";
+    const folderText = folderLabel.createSpan({ cls: "columns-toolbar-value" });
+    folderText.textContent = folder;
+    folderLabel.addEventListener("click", () => {
+      new FolderSuggestModal(this.app, this.getSourceFolder(), (path) => {
+        this.setSourceFolder(path);
+      }).open();
+    });
+
+    // Separator
+    bar.createSpan({ cls: "columns-toolbar-sep" }).textContent = "·";
+
+    // Column property label
+    const colProp = this.getColumnProperty();
+    const colLabel = bar.createSpan({ cls: "columns-toolbar-label" });
+    colLabel.createSpan({ cls: "columns-toolbar-icon" }).textContent = "🏷";
+    const colText = colLabel.createSpan({ cls: "columns-toolbar-value" });
+    colText.textContent = colProp;
+    colLabel.addEventListener("click", () => {
+      new PropertySuggestModal(this.app, colProp, this.getAllFrontmatterKeys(), (prop) => {
+        this.setColumnProperty(prop);
+      }).open();
+    });
+
+    return bar;
+  }
+
   // -----------------------------------------------------------------------
   //  Rendering
   // -----------------------------------------------------------------------
@@ -218,8 +263,11 @@ class ColumnsView extends BasesView implements HoverParent {
   render(): void {
     this.containerEl.empty();
 
+    // Toolbar at the very top
+    this.renderToolbar();
+
     const entries = this.data?.entries ?? [];
-    const folder = this.cfg(CFG_SOURCE_FOLDER, "");
+    const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
 
     // Filter by source folder
@@ -250,6 +298,15 @@ class ColumnsView extends BasesView implements HoverParent {
       }
     }
 
+    // Collect all tags for each file (needed for AND mode)
+    const fileTags = new Map<string, string[]>();
+    for (const [val, paths] of columnMap) {
+      for (const p of paths) {
+        if (!fileTags.has(p)) fileTags.set(p, []);
+        fileTags.get(p)!.push(val);
+      }
+    }
+
     // Tag-based filtering
     const applyFilters = (paths: string[], allTags: string[]): string[] => {
       if (this.activeFilters.size === 0) return paths;
@@ -262,15 +319,6 @@ class ColumnsView extends BasesView implements HoverParent {
         allTags.some((t) => this.activeFilters.has(t)),
       );
     };
-
-    // Collect all tags for each file (needed for AND mode)
-    const fileTags = new Map<string, string[]>();
-    for (const [val, paths] of columnMap) {
-      for (const p of paths) {
-        if (!fileTags.has(p)) fileTags.set(p, []);
-        fileTags.get(p)!.push(val);
-      }
-    }
 
     // Render filter bar
     this.renderFilterBar(columnMap);
@@ -289,13 +337,10 @@ class ColumnsView extends BasesView implements HoverParent {
           noValueFiles.map((f) => f.path),
           [],
         ).map((p) => noValueFiles.find((f) => f.path === p)!);
-        // In AND mode, (No value) column is hidden if filters active
         if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
         const rawPaths = Array.from(columnMap.get(colName)!);
-        const tags = fileTags;
         const filteredPaths = applyFilters(rawPaths, rawPaths);
-        // Re-map paths back to files but only those that belong to this column
         const entryMap = new Map<string, TFile>();
         for (const entry of filtered) {
           if (entry.file instanceof TFile) entryMap.set(entry.file.path, entry.file);
@@ -303,14 +348,11 @@ class ColumnsView extends BasesView implements HoverParent {
         colFiles = filteredPaths
           .filter((p) => {
             const vals = fileTags.get(p) ?? [];
-            // In AND mode: file stays in column only if it has this tag
-            // In OR mode: file is in this column if it has this value
             return vals.includes(colName);
           })
           .map((p) => entryMap.get(p)!)
           .filter(Boolean);
 
-        // In AND mode, remove files that don't have ALL active tags
         if (this.andMode && this.activeFilters.size > 0) {
           colFiles = colFiles.filter((f) => {
             const tags = fileTags.get(f.path) ?? [];
@@ -333,7 +375,6 @@ class ColumnsView extends BasesView implements HoverParent {
 
     const barEl = this.containerEl.createDiv({ cls: "columns-filter-bar" });
 
-    // AND/OR toggle
     const modeBtn = barEl.createSpan({ cls: "columns-mode-btn" });
     modeBtn.textContent = this.andMode ? "AND" : "OR";
     modeBtn.addEventListener("click", () => {
@@ -341,7 +382,6 @@ class ColumnsView extends BasesView implements HoverParent {
       this.render();
     });
 
-    // "All" pill
     const allPill = barEl.createSpan({
       cls:
         "columns-filter-pill" +
@@ -353,7 +393,6 @@ class ColumnsView extends BasesView implements HoverParent {
       this.render();
     });
 
-    // Tag pills
     for (const tag of tags) {
       const pill = barEl.createSpan({
         cls:
@@ -459,6 +498,93 @@ class ColumnsView extends BasesView implements HoverParent {
 }
 
 // ---------------------------------------------------------------------------
+//  Folder Suggest Modal
+// ---------------------------------------------------------------------------
+
+class FolderSuggestModal extends SuggestModal<string> {
+  private picked: string;
+  private onChoose: (path: string) => void;
+
+  constructor(app: App, current: string, onChoose: (path: string) => void) {
+    super(app);
+    this.picked = current;
+    this.onChoose = onChoose;
+    this.setPlaceholder("Type to filter folders…");
+    this.setInstructions([
+      { command: "↵", purpose: "select" },
+      { command: "esc", purpose: "cancel" },
+    ]);
+  }
+
+  getSuggestions(query: string): string[] {
+    const folders = this.app.vault
+      .getAllLoadedFiles()
+      .filter((f): f is TFolder => f instanceof TFolder)
+      .map((f) => f.path)
+      .filter((p) => p !== "")
+      .sort();
+    const all = ["", ...folders];
+    if (!query) return all;
+    return all.filter((p) =>
+      (p || "(entire vault)").toLowerCase().includes(query.toLowerCase()),
+    );
+  }
+
+  renderSuggestion(path: string, el: HTMLElement): void {
+    el.textContent = path || "(entire vault)";
+  }
+
+  onChooseSuggestion(path: string): void {
+    this.onChoose(path);
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Property Suggest Modal
+// ---------------------------------------------------------------------------
+
+class PropertySuggestModal extends SuggestModal<string> {
+  private currentKeys: string[];
+  private onChoose: (prop: string) => void;
+
+  constructor(
+    app: App,
+    current: string,
+    allKeys: string[],
+    onChoose: (prop: string) => void,
+  ) {
+    super(app);
+    this.currentKeys = allKeys;
+    this.onChoose = onChoose;
+    this.setPlaceholder("Type property name or filter…");
+    this.setInstructions([
+      { command: "↵", purpose: "select" },
+      { command: "esc", purpose: "cancel" },
+    ]);
+  }
+
+  getSuggestions(query: string): string[] {
+    const presets = PRIORITY_PROPS.map(
+      (p) => `${p} — auto-detect priority`,
+    );
+    const keys = this.currentKeys;
+    const all = [...presets, ...keys];
+    if (!query) return all;
+    return all.filter((k) => k.toLowerCase().includes(query.toLowerCase()));
+  }
+
+  renderSuggestion(item: string, el: HTMLElement): void {
+    el.textContent = item;
+  }
+
+  onChooseSuggestion(item: string): void {
+    // Extract clean key from "key — auto-detect priority" format
+    const clean = item.includes(" — ") ? item.split(" — ")[0] : item;
+    this.onChoose(clean);
+  }
+}
+
+// ---------------------------------------------------------------------------
 //  File Preview Modal
 // ---------------------------------------------------------------------------
 
@@ -475,7 +601,7 @@ class FilePreviewModal extends Modal {
     contentEl.empty();
     contentEl.addClass("columns-modal-content");
 
-    const titleEl = contentEl.createEl("h2", { text: this.file.basename });
+    contentEl.createEl("h2", { text: this.file.basename });
 
     const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
 
