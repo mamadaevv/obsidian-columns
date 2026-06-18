@@ -244,7 +244,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
       );
     };
     this.renderFilterBar(columnMap);
-    const colNames = Array.from(columnMap.keys()).sort();
+    let colNames = Array.from(columnMap.keys()).sort();
+    if (this.activeFilters.size > 0) {
+      colNames = colNames.filter((name) => this.activeFilters.has(name));
+    }
     if (noValueEntries.length > 0) colNames.push("(No value)");
     const colWidth = this.getColumnWidth();
     const visibleProps = this.getVisiblePropertyIds(columnProp);
@@ -301,6 +304,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
         } else {
           this.activeFilters.add(tag);
         }
+        this.render();
+      });
+      pill.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        this.activeFilters.clear();
+        this.activeFilters.add(tag);
         this.render();
       });
     }

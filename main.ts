@@ -300,8 +300,11 @@ class ColumnsView extends BasesView {
     // Render filter bar
     this.renderFilterBar(columnMap);
 
-    // Build column display list
-    const colNames = Array.from(columnMap.keys()).sort();
+    // Build column display list — only show columns matching selected tags
+    let colNames = Array.from(columnMap.keys()).sort();
+    if (this.activeFilters.size > 0) {
+      colNames = colNames.filter((name) => this.activeFilters.has(name));
+    }
     if (noValueEntries.length > 0) colNames.push("(No value)");
 
     const colWidth = this.getColumnWidth();
@@ -366,12 +369,20 @@ class ColumnsView extends BasesView {
           (this.activeFilters.has(tag) ? " is-active" : ""),
       });
       pill.textContent = tag;
+      // ЛКМ — toggle (добавить/убрать)
       pill.addEventListener("click", () => {
         if (this.activeFilters.has(tag)) {
           this.activeFilters.delete(tag);
         } else {
           this.activeFilters.add(tag);
         }
+        this.render();
+      });
+      // ПКМ — выбрать только этот тег
+      pill.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        this.activeFilters.clear();
+        this.activeFilters.add(tag);
         this.render();
       });
     }
