@@ -126,7 +126,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const v = this.config?.get(key);
     return v ?? fallback;
   }
-  /** Strip 'note.' prefix from BasesPropertyId to get raw frontmatter key. */
   propKey(key) {
     const id = this.config?.getAsPropertyId(key);
     if (!id) return null;
@@ -153,7 +152,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
     return ["active", "modal", "tab", "split"].includes(v) ? v : "modal";
   }
-  /** Resolve when no property selected — find first priority prop in frontmatter. */
   detectColumnProperty() {
     const entries = this.data?.data ?? [];
     const seen = /* @__PURE__ */ new Set();
@@ -181,94 +179,103 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (typeof raw === "number") return [String(raw)];
     return [];
   }
+  /** Get visible properties from the Properties button, skip file props and column prop. */
+  getVisiblePropertyIds(columnProp) {
+    const props = this.data?.properties ?? [];
+    return props.filter((id) => {
+      if (id.startsWith("file.")) return false;
+      const parsed = (0, import_obsidian.parsePropertyId)(id);
+      if (!parsed) return false;
+      if (parsed.name === columnProp) return false;
+      const titleProp = this.getTitleProperty();
+      if (titleProp && parsed.name === titleProp) return false;
+      return true;
+    });
+  }
   // -----------------------------------------------------------------------
   //  Rendering
   // -----------------------------------------------------------------------
   render() {
     this.containerEl.empty();
     const entries = this.data?.data ?? [];
-    console.log("[Columns] entries count:", entries.length);
     if (entries.length === 0) {
       const emptyEl = this.containerEl.createDiv({ cls: "columns-empty" });
-      emptyEl.textContent = "No files found. Create a .base file in your vault, configure its query, then switch to Columns view.";
+      emptyEl.textContent = "No files found.";
       return;
     }
     const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
-    console.log("[Columns] folder:", folder, "prop:", columnProp);
     const prefix = folder ? folder.endsWith("/") ? folder : folder + "/" : "";
     const filtered = prefix ? entries.filter(
       (e) => e.file?.path === folder || e.file?.path?.startsWith(prefix)
     ) : entries;
-    console.log("[Columns] filtered count:", filtered.length);
     const columnMap = /* @__PURE__ */ new Map();
-    const noValueFiles = [];
+    const noValueEntries = [];
     for (const entry of filtered) {
       const file = entry.file;
       if (!(file instanceof import_obsidian.TFile)) continue;
       const values = this.getColumnValues(file, columnProp);
       if (values.length === 0) {
-        noValueFiles.push(file);
+        noValueEntries.push(entry);
       } else {
         for (const v of values) {
-          if (!columnMap.has(v)) columnMap.set(v, /* @__PURE__ */ new Set());
-          columnMap.get(v).add(file.path);
+          if (!columnMap.has(v)) columnMap.set(v, []);
+          columnMap.get(v).push(entry);
         }
       }
     }
-    console.log("[Columns] columnMap keys:", Array.from(columnMap.keys()));
-    console.log("[Columns] noValueFiles:", noValueFiles.length);
     const fileTags = /* @__PURE__ */ new Map();
-    for (const [val, paths] of columnMap) {
-      for (const p of paths) {
+    for (const [val, colEntries] of columnMap) {
+      for (const entry of colEntries) {
+        const p = entry.file?.path;
+        if (!p) continue;
         if (!fileTags.has(p)) fileTags.set(p, []);
         fileTags.get(p).push(val);
       }
     }
-    const applyFilters = (paths, allTags) => {
+    const applyFilters = (paths) => {
       if (this.activeFilters.size === 0) return paths;
       if (this.andMode) {
         return paths.filter(
-          (p) => allTags.every((t) => this.activeFilters.has(t))
+          (p) => Array.from(this.activeFilters).every((t) => fileTags.get(p)?.includes(t))
         );
       }
       return paths.filter(
-        (p) => allTags.some((t) => this.activeFilters.has(t))
+        (p) => Array.from(this.activeFilters).some((t) => fileTags.get(p)?.includes(t))
       );
     };
     this.renderFilterBar(columnMap);
     const colNames = Array.from(columnMap.keys()).sort();
-    if (noValueFiles.length > 0) colNames.push("(No value)");
+    if (noValueEntries.length > 0) colNames.push("(No value)");
     const colWidth = this.getColumnWidth();
+    const visibleProps = this.getVisiblePropertyIds(columnProp);
     const boardEl = this.containerEl.createDiv({ cls: "columns-board" });
     for (const colName of colNames) {
-      let colFiles;
+      let colEntries;
       if (colName === "(No value)") {
-        colFiles = applyFilters(
-          noValueFiles.map((f) => f.path),
-          []
-        ).map((p) => noValueFiles.find((f) => f.path === p));
+        const paths = noValueEntries.map((e) => e.file?.path ?? "");
+        const filteredPaths = applyFilters(paths);
+        colEntries = noValueEntries.filter(
+          (e) => e.file?.path && filteredPaths.includes(e.file.path)
+        );
         if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
-        const rawPaths = Array.from(columnMap.get(colName));
-        const filteredPaths = applyFilters(rawPaths, rawPaths);
-        const entryMap = /* @__PURE__ */ new Map();
-        for (const entry of filtered) {
-          if (entry.file instanceof import_obsidian.TFile) entryMap.set(entry.file.path, entry.file);
-        }
-        colFiles = filteredPaths.filter((p) => {
-          const vals = fileTags.get(p) ?? [];
-          return vals.includes(colName);
-        }).map((p) => entryMap.get(p)).filter(Boolean);
+        const raw = columnMap.get(colName);
+        const paths = raw.map((e) => e.file?.path ?? "");
+        const filteredPaths = applyFilters(paths);
+        colEntries = raw.filter(
+          (e) => e.file?.path && filteredPaths.includes(e.file.path)
+        );
         if (this.andMode && this.activeFilters.size > 0) {
-          colFiles = colFiles.filter((f) => {
-            const tags = fileTags.get(f.path) ?? [];
+          colEntries = colEntries.filter((e) => {
+            const p = e.file?.path ?? "";
+            const tags = fileTags.get(p) ?? [];
             return Array.from(this.activeFilters).every((t) => tags.includes(t));
           });
         }
       }
-      if (colFiles.length === 0) continue;
-      this.renderColumn(boardEl, colName, colFiles, colWidth);
+      if (colEntries.length === 0) continue;
+      this.renderColumn(boardEl, colName, colEntries, colWidth, visibleProps);
     }
   }
   // -----------------------------------------------------------------------
@@ -310,23 +317,34 @@ var ColumnsView = class extends import_obsidian.BasesView {
   // -----------------------------------------------------------------------
   //  Column & Card
   // -----------------------------------------------------------------------
-  renderColumn(boardEl, name, files, width) {
+  renderColumn(boardEl, name, entries, width, visibleProps) {
     const colEl = boardEl.createDiv({ cls: "columns-column" });
     colEl.style.flexBasis = width + "px";
     const headerEl = colEl.createDiv({ cls: "columns-column-header" });
     const titleSpan = headerEl.createSpan({ cls: "columns-column-title" });
     titleSpan.textContent = name;
     const countSpan = headerEl.createSpan({ cls: "columns-column-count" });
-    countSpan.textContent = String(files.length);
+    countSpan.textContent = String(entries.length);
     const cardsEl = colEl.createDiv({ cls: "columns-cards" });
-    for (const file of files) {
-      this.renderCard(cardsEl, file);
+    for (const entry of entries) {
+      this.renderCard(cardsEl, entry, visibleProps);
     }
   }
-  renderCard(cardsEl, file) {
+  renderCard(cardsEl, entry, visibleProps) {
+    const file = entry.file;
+    if (!(file instanceof import_obsidian.TFile)) return;
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
+    const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     const title = this.getCardTitle(file);
-    cardEl.textContent = title;
+    titleEl.textContent = title;
+    for (const propId of visibleProps) {
+      const val = entry.getValue(propId);
+      if (!val || val.isTruthy() === false) continue;
+      const chip = cardEl.createSpan({ cls: "columns-card-chip" });
+      const parsed = (0, import_obsidian.parsePropertyId)(propId);
+      const label = parsed?.name ?? propId;
+      chip.textContent = `${label}: ${val.toString()}`;
+    }
     cardEl.addEventListener("click", (e) => {
       e.stopPropagation();
       this.openFile(file);

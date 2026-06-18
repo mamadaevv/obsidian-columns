@@ -151,7 +151,6 @@ class ColumnsView extends BasesView implements HoverParent {
     return (v as T) ?? fallback;
   }
 
-  /** Strip 'note.' prefix from BasesPropertyId to get raw frontmatter key. */
   private propKey(key: string): string | null {
     const id = this.config?.getAsPropertyId(key);
     if (!id) return null;
@@ -184,7 +183,6 @@ class ColumnsView extends BasesView implements HoverParent {
     return ["active", "modal", "tab", "split"].includes(v) ? v : "modal";
   }
 
-  /** Resolve when no property selected — find first priority prop in frontmatter. */
   private detectColumnProperty(): string {
     const entries = this.data?.data ?? [];
     const seen = new Set<string>();
@@ -217,6 +215,22 @@ class ColumnsView extends BasesView implements HoverParent {
     return [];
   }
 
+  /** Get visible properties from the Properties button, skip file props and column prop. */
+  private getVisiblePropertyIds(columnProp: string): string[] {
+    const props = this.data?.properties ?? [];
+    return props.filter((id) => {
+      if (id.startsWith("file.")) return false;
+      const parsed = parsePropertyId(id);
+      if (!parsed) return false;
+      // Skip the column property itself (already shown as column header)
+      if (parsed.name === columnProp) return false;
+      // Skip the title property (already shown as card title)
+      const titleProp = this.getTitleProperty();
+      if (titleProp && parsed.name === titleProp) return false;
+      return true;
+    });
+  }
+
   // -----------------------------------------------------------------------
   //  Rendering
   // -----------------------------------------------------------------------
@@ -226,21 +240,15 @@ class ColumnsView extends BasesView implements HoverParent {
 
     const entries = this.data?.data ?? [];
 
-    console.log("[Columns] entries count:", entries.length);
-
-    // If no entries, show a helpful message
     if (entries.length === 0) {
       const emptyEl = this.containerEl.createDiv({ cls: "columns-empty" });
-      emptyEl.textContent = "No files found. Create a .base file in your vault, configure its query, then switch to Columns view.";
+      emptyEl.textContent = "No files found.";
       return;
     }
 
     const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
 
-    console.log("[Columns] folder:", folder, "prop:", columnProp);
-
-    // Filter by source folder
     const prefix = folder ? (folder.endsWith("/") ? folder : folder + "/") : "";
     const filtered = prefix
       ? entries.filter(
@@ -249,11 +257,9 @@ class ColumnsView extends BasesView implements HoverParent {
         )
       : entries;
 
-    console.log("[Columns] filtered count:", filtered.length);
-
-    // Build column map: value → Set<file path>
-    const columnMap = new Map<string, Set<string>>();
-    const noValueFiles: TFile[] = [];
+    // Build column map: value → BasesEntry[]
+    const columnMap = new Map<string, BasesEntry[]>();
+    const noValueEntries: BasesEntry[] = [];
 
     for (const entry of filtered) {
       const file = entry.file;
@@ -261,37 +267,36 @@ class ColumnsView extends BasesView implements HoverParent {
 
       const values = this.getColumnValues(file, columnProp);
       if (values.length === 0) {
-        noValueFiles.push(file);
+        noValueEntries.push(entry);
       } else {
         for (const v of values) {
-          if (!columnMap.has(v)) columnMap.set(v, new Set());
-          columnMap.get(v)!.add(file.path);
+          if (!columnMap.has(v)) columnMap.set(v, []);
+          columnMap.get(v)!.push(entry);
         }
       }
     }
 
-    console.log("[Columns] columnMap keys:", Array.from(columnMap.keys()));
-    console.log("[Columns] noValueFiles:", noValueFiles.length);
-
     // Collect all tags for each file (for AND mode)
     const fileTags = new Map<string, string[]>();
-    for (const [val, paths] of columnMap) {
-      for (const p of paths) {
+    for (const [val, colEntries] of columnMap) {
+      for (const entry of colEntries) {
+        const p = entry.file?.path;
+        if (!p) continue;
         if (!fileTags.has(p)) fileTags.set(p, []);
         fileTags.get(p)!.push(val);
       }
     }
 
     // Tag-based filtering
-    const applyFilters = (paths: string[], allTags: string[]): string[] => {
+    const applyFilters = (paths: string[]): string[] => {
       if (this.activeFilters.size === 0) return paths;
       if (this.andMode) {
         return paths.filter((p) =>
-          allTags.every((t) => this.activeFilters.has(t)),
+          Array.from(this.activeFilters).every((t) => fileTags.get(p)?.includes(t)),
         );
       }
       return paths.filter((p) =>
-        allTags.some((t) => this.activeFilters.has(t)),
+        Array.from(this.activeFilters).some((t) => fileTags.get(p)?.includes(t)),
       );
     };
 
@@ -300,45 +305,41 @@ class ColumnsView extends BasesView implements HoverParent {
 
     // Build column display list
     const colNames = Array.from(columnMap.keys()).sort();
-    if (noValueFiles.length > 0) colNames.push("(No value)");
+    if (noValueEntries.length > 0) colNames.push("(No value)");
 
     const colWidth = this.getColumnWidth();
+    const visibleProps = this.getVisiblePropertyIds(columnProp);
     const boardEl = this.containerEl.createDiv({ cls: "columns-board" });
 
     for (const colName of colNames) {
-      let colFiles: TFile[];
+      let colEntries: BasesEntry[];
       if (colName === "(No value)") {
-        colFiles = applyFilters(
-          noValueFiles.map((f) => f.path),
-          [],
-        ).map((p) => noValueFiles.find((f) => f.path === p)!);
+        const paths = noValueEntries.map((e) => e.file?.path ?? "");
+        const filteredPaths = applyFilters(paths);
+        colEntries = noValueEntries.filter(
+          (e) => e.file?.path && filteredPaths.includes(e.file.path),
+        );
         if (this.activeFilters.size > 0 && this.andMode) continue;
       } else {
-        const rawPaths = Array.from(columnMap.get(colName)!);
-        const filteredPaths = applyFilters(rawPaths, rawPaths);
-        const entryMap = new Map<string, TFile>();
-        for (const entry of filtered) {
-          if (entry.file instanceof TFile) entryMap.set(entry.file.path, entry.file);
-        }
-        colFiles = filteredPaths
-          .filter((p) => {
-            const vals = fileTags.get(p) ?? [];
-            return vals.includes(colName);
-          })
-          .map((p) => entryMap.get(p)!)
-          .filter(Boolean);
+        const raw = columnMap.get(colName)!;
+        const paths = raw.map((e) => e.file?.path ?? "");
+        const filteredPaths = applyFilters(paths);
+        colEntries = raw.filter(
+          (e) => e.file?.path && filteredPaths.includes(e.file.path),
+        );
 
         if (this.andMode && this.activeFilters.size > 0) {
-          colFiles = colFiles.filter((f) => {
-            const tags = fileTags.get(f.path) ?? [];
+          colEntries = colEntries.filter((e) => {
+            const p = e.file?.path ?? "";
+            const tags = fileTags.get(p) ?? [];
             return Array.from(this.activeFilters).every((t) => tags.includes(t));
           });
         }
       }
 
-      if (colFiles.length === 0) continue;
+      if (colEntries.length === 0) continue;
 
-      this.renderColumn(boardEl, colName, colFiles, colWidth);
+      this.renderColumn(boardEl, colName, colEntries, colWidth, visibleProps);
     }
   }
 
@@ -346,7 +347,7 @@ class ColumnsView extends BasesView implements HoverParent {
   //  Filter bar
   // -----------------------------------------------------------------------
 
-  private renderFilterBar(columnMap: Map<string, Set<string>>): void {
+  private renderFilterBar(columnMap: Map<string, BasesEntry[]>): void {
     const tags = Array.from(columnMap.keys()).sort();
     if (tags.length === 0 && this.activeFilters.size === 0) return;
 
@@ -395,8 +396,9 @@ class ColumnsView extends BasesView implements HoverParent {
   private renderColumn(
     boardEl: HTMLElement,
     name: string,
-    files: TFile[],
+    entries: BasesEntry[],
     width: number,
+    visibleProps: string[],
   ): void {
     const colEl = boardEl.createDiv({ cls: "columns-column" });
     colEl.style.flexBasis = width + "px";
@@ -405,19 +407,39 @@ class ColumnsView extends BasesView implements HoverParent {
     const titleSpan = headerEl.createSpan({ cls: "columns-column-title" });
     titleSpan.textContent = name;
     const countSpan = headerEl.createSpan({ cls: "columns-column-count" });
-    countSpan.textContent = String(files.length);
+    countSpan.textContent = String(entries.length);
 
     const cardsEl = colEl.createDiv({ cls: "columns-cards" });
 
-    for (const file of files) {
-      this.renderCard(cardsEl, file);
+    for (const entry of entries) {
+      this.renderCard(cardsEl, entry, visibleProps);
     }
   }
 
-  private renderCard(cardsEl: HTMLElement, file: TFile): void {
+  private renderCard(
+    cardsEl: HTMLElement,
+    entry: BasesEntry,
+    visibleProps: string[],
+  ): void {
+    const file = entry.file;
+    if (!(file instanceof TFile)) return;
+
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
+
+    // Title
+    const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     const title = this.getCardTitle(file);
-    cardEl.textContent = title;
+    titleEl.textContent = title;
+
+    // Visible property chips
+    for (const propId of visibleProps) {
+      const val = entry.getValue(propId);
+      if (!val || val.isTruthy() === false) continue;
+      const chip = cardEl.createSpan({ cls: "columns-card-chip" });
+      const parsed = parsePropertyId(propId);
+      const label = parsed?.name ?? propId;
+      chip.textContent = `${label}: ${val.toString()}`;
+    }
 
     cardEl.addEventListener("click", (e) => {
       e.stopPropagation();

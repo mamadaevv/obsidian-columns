@@ -142,16 +142,15 @@
 .columns-card {
   padding: 8px 10px;
   border-radius: 6px;
-  font-size: 13px;
-  line-height: 1.4;
   cursor: pointer;
   user-select: none;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   transition: box-shadow 0.1s, border-color 0.1s;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .columns-card:hover {
@@ -161,6 +160,23 @@
 
 .columns-card:active {
   background: var(--background-modifier-active);
+}
+
+.columns-card-title {
+  font-size: 13px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.columns-card-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------------------------------------------------------------------------
