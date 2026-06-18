@@ -157,7 +157,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
   }
   /** Resolve when no property selected — find first priority prop in frontmatter. */
   detectColumnProperty() {
-    const entries = this.data?.entries ?? [];
+    const entries = this.data?.data ?? [];
     const seen = /* @__PURE__ */ new Set();
     for (const entry of entries) {
       if (seen.size >= 50) break;
@@ -188,7 +188,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
   // -----------------------------------------------------------------------
   render() {
     this.containerEl.empty();
-    const entries = this.data?.entries ?? [];
+    const entries = this.data?.data ?? [];
+    console.log("[Columns] entries count:", entries.length);
     if (entries.length === 0) {
       const emptyEl = this.containerEl.createDiv({ cls: "columns-empty" });
       emptyEl.textContent = "No files found. Create a .base file in your vault, configure its query, then switch to Columns view.";
@@ -196,10 +197,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
     const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
+    console.log("[Columns] folder:", folder, "prop:", columnProp);
     const prefix = folder ? folder.endsWith("/") ? folder : folder + "/" : "";
     const filtered = prefix ? entries.filter(
       (e) => e.file?.path === folder || e.file?.path?.startsWith(prefix)
     ) : entries;
+    console.log("[Columns] filtered count:", filtered.length);
     const columnMap = /* @__PURE__ */ new Map();
     const noValueFiles = [];
     for (const entry of filtered) {
@@ -215,6 +218,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
         }
       }
     }
+    console.log("[Columns] columnMap keys:", Array.from(columnMap.keys()));
+    console.log("[Columns] noValueFiles:", noValueFiles.length);
     const fileTags = /* @__PURE__ */ new Map();
     for (const [val, paths] of columnMap) {
       for (const p of paths) {

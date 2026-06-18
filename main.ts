@@ -190,7 +190,7 @@ class ColumnsView extends BasesView implements HoverParent {
 
   /** Resolve when no property selected — find first priority prop in frontmatter. */
   private detectColumnProperty(): string {
-    const entries = this.data?.entries ?? [];
+    const entries = this.data?.data ?? [];
     const seen = new Set<string>();
 
     for (const entry of entries) {
@@ -228,7 +228,9 @@ class ColumnsView extends BasesView implements HoverParent {
   render(): void {
     this.containerEl.empty();
 
-    const entries = this.data?.entries ?? [];
+    const entries = this.data?.data ?? [];
+
+    console.log("[Columns] entries count:", entries.length);
 
     // If no entries, show a helpful message
     if (entries.length === 0) {
@@ -240,6 +242,8 @@ class ColumnsView extends BasesView implements HoverParent {
     const folder = this.getSourceFolder();
     const columnProp = this.getColumnProperty();
 
+    console.log("[Columns] folder:", folder, "prop:", columnProp);
+
     // Filter by source folder
     const prefix = folder ? (folder.endsWith("/") ? folder : folder + "/") : "";
     const filtered = prefix
@@ -248,6 +252,8 @@ class ColumnsView extends BasesView implements HoverParent {
             e.file?.path === folder || e.file?.path?.startsWith(prefix),
         )
       : entries;
+
+    console.log("[Columns] filtered count:", filtered.length);
 
     // Build column map: value → Set<file path>
     const columnMap = new Map<string, Set<string>>();
@@ -267,6 +273,9 @@ class ColumnsView extends BasesView implements HoverParent {
         }
       }
     }
+
+    console.log("[Columns] columnMap keys:", Array.from(columnMap.keys()));
+    console.log("[Columns] noValueFiles:", noValueFiles.length);
 
     // Collect all tags for each file (for AND mode)
     const fileTags = new Map<string, string[]>();
