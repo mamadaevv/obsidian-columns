@@ -1,0 +1,183 @@
+/* ---------------------------------------------------------------------------
+  Columns view — main container
+  --------------------------------------------------------------------------- */
+
+.columns-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+  Filter bar
+  --------------------------------------------------------------------------- */
+
+.columns-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.columns-mode-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-accent);
+  background: var(--background-modifier-hover);
+  border: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.columns-mode-btn:hover {
+  background: var(--background-modifier-active);
+}
+
+.columns-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-muted);
+  background: var(--background-secondary-alt);
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.columns-filter-pill:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.columns-filter-pill.is-active {
+  color: var(--text-on-accent);
+  background: var(--interactive-accent);
+}
+
+/* ---------------------------------------------------------------------------
+  Board (scrollable horizontal area)
+  --------------------------------------------------------------------------- */
+
+.columns-board {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  padding: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: flex-start;
+}
+
+/* ---------------------------------------------------------------------------
+  Column
+  --------------------------------------------------------------------------- */
+
+.columns-column {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 180px;
+  max-width: 500px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  max-height: 100%;
+}
+
+.columns-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-normal);
+  flex-shrink: 0;
+}
+
+.columns-column-count {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  background: var(--background-modifier-hover);
+  padding: 0 6px;
+  border-radius: 8px;
+  line-height: 20px;
+}
+
+.columns-column-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+  Card list (scrollable vertical area inside column)
+  --------------------------------------------------------------------------- */
+
+.columns-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------------------
+  Card
+  --------------------------------------------------------------------------- */
+
+.columns-card {
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  transition: box-shadow 0.1s, border-color 0.1s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.columns-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.columns-card:active {
+  background: var(--background-modifier-active);
+}
+
+/* ---------------------------------------------------------------------------
+  Modal (file preview)
+  --------------------------------------------------------------------------- */
+
+.columns-modal-content {
+  padding: 0;
+}
+
+.columns-modal-content h2 {
+  padding: 16px 20px 0;
+  margin: 0;
+}
+
+.columns-modal-body {
+  padding: 12px 20px 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}

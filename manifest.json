@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-columns",
+  "name": "Columns",
+  "version": "0.1.0",
+  "minAppVersion": "1.8.0",
+  "description": "Card view grouped by tag/column property with tag filtering",
+  "author": "User",
+  "isDesktopOnly": false
+}
