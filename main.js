@@ -271,6 +271,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
           });
         }
       }
+      if (colFiles.length === 0) continue;
       this.renderColumn(boardEl, colName, colFiles, colWidth);
     }
   }

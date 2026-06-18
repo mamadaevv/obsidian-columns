@@ -342,6 +342,8 @@ class ColumnsView extends BasesView implements HoverParent {
         }
       }
 
+      if (colFiles.length === 0) continue;
+
       this.renderColumn(boardEl, colName, colFiles, colWidth);
     }
   }
