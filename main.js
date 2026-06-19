@@ -114,7 +114,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
           active: "Active pane",
           modal: "Floating modal",
           tab: "New tab",
-          split: "Split to the right"
+          split: "Split to the right",
+          "split-bottom": "Split to the bottom"
         }
       }
     ];
@@ -150,7 +151,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
   }
   getOpenBehavior() {
     const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
-    return ["active", "modal", "tab", "split"].includes(v) ? v : "modal";
+    return ["active", "modal", "tab", "split", "split-bottom"].includes(v) ? v : "modal";
   }
   detectColumnProperty() {
     const entries = this.data?.data ?? [];
@@ -406,11 +407,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
         this.app.workspace.getLeaf(true).openFile(file);
         break;
       }
-      case "split": {
+      case "split":
+      case "split-bottom": {
         if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
           this.splitLeaf.detach();
         }
-        this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
+        const dir = behavior === "split-bottom" ? "horizontal" : "vertical";
+        this.splitLeaf = this.app.workspace.getLeaf("split", dir);
         this.splitLeaf.openFile(file);
         break;
       }
