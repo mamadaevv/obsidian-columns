@@ -384,10 +384,18 @@ var ColumnsView = class extends import_obsidian.BasesView {
   // -----------------------------------------------------------------------
   openFile(file) {
     const behavior = this.getOpenBehavior();
+    if (behavior === "active" || behavior === "tab") {
+      const open = this.app.workspace.getLeavesOfType("markdown").find(
+        (l) => l.view?.file?.path === file.path
+      );
+      if (open) {
+        this.app.workspace.setActiveLeaf(open, { focus: true });
+        return;
+      }
+    }
     switch (behavior) {
       case "active": {
-        const leaf = this.app.workspace.getLeaf(false);
-        leaf.openFile(file);
+        this.app.workspace.getLeaf(false).openFile(file);
         break;
       }
       case "modal": {
@@ -395,8 +403,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
         break;
       }
       case "tab": {
-        const leaf = this.app.workspace.getLeaf(true);
-        leaf.openFile(file);
+        this.app.workspace.getLeaf(true).openFile(file);
         break;
       }
       case "split": {

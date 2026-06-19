@@ -486,10 +486,20 @@ class ColumnsView extends BasesView {
   private openFile(file: TFile): void {
     const behavior = this.getOpenBehavior();
 
+    // For tab/active: navigate if already open
+    if (behavior === "active" || behavior === "tab") {
+      const open = this.app.workspace.getLeavesOfType("markdown").find(
+        (l) => (l.view as any)?.file?.path === file.path,
+      );
+      if (open) {
+        this.app.workspace.setActiveLeaf(open, { focus: true });
+        return;
+      }
+    }
+
     switch (behavior) {
       case "active": {
-        const leaf = this.app.workspace.getLeaf(false);
-        leaf.openFile(file);
+        this.app.workspace.getLeaf(false).openFile(file);
         break;
       }
       case "modal": {
@@ -497,8 +507,7 @@ class ColumnsView extends BasesView {
         break;
       }
       case "tab": {
-        const leaf = this.app.workspace.getLeaf(true);
-        leaf.openFile(file);
+        this.app.workspace.getLeaf(true).openFile(file);
         break;
       }
       case "split": {
