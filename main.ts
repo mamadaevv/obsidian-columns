@@ -139,10 +139,14 @@ class ColumnsView extends BasesView {
   }
 
   private getColumnProperty(): string {
-    const id = this.config?.getAsPropertyId('groupByProperty');
-    if (!id) return "tags";
-    const parsed = parsePropertyId(id);
-    return parsed?.name ?? "tags";
+    // Read from the built-in groupBy config (set via toolbar Group by button)
+    const cfg = this.config as any;
+    const raw: string | undefined = cfg?.groupBy?.property;
+    if (raw) {
+      const parsed = parsePropertyId(raw as any);
+      return parsed?.name ?? raw;
+    }
+    return "tags";
   }
 
   private getTitleProperty(): string | null {

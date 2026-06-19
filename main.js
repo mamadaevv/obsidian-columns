@@ -115,10 +115,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
     return null;
   }
   getColumnProperty() {
-    const id = this.config?.getAsPropertyId("groupByProperty");
-    if (!id) return "tags";
-    const parsed = (0, import_obsidian.parsePropertyId)(id);
-    return parsed?.name ?? "tags";
+    const cfg = this.config;
+    const raw = cfg?.groupBy?.property;
+    if (raw) {
+      const parsed = (0, import_obsidian.parsePropertyId)(raw);
+      return parsed?.name ?? raw;
+    }
+    return "tags";
   }
   getTitleProperty() {
     const fromProp = this.propKey(CFG_TITLE_PROP);
