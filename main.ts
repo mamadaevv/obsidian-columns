@@ -296,13 +296,6 @@ class ColumnsView extends BasesView {
     // Render filter bar
     this.renderFilterBar(columnMap);
 
-    // Calculate total AFTER folder filter
-    const totalFiles = filtered.reduce((acc, e) => {
-      const file = e.file;
-      if (!(file instanceof TFile)) return acc;
-      return acc + 1;
-    }, 0);
-
     // Build column display list — only show columns matching selected tags
     let colNames = Array.from(columnMap.keys()).sort();
     if (this.activeFilters.size > 0) {
