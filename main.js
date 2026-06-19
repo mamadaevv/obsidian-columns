@@ -53,7 +53,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.type = "columns";
     this.activeFilters = /* @__PURE__ */ new Set();
     this.andMode = true;
-    this.splitLeaf = null;
     this.scrollEl = scrollEl;
     this.plugin = plugin;
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
@@ -113,9 +112,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
         options: {
           active: "Active pane",
           modal: "Floating modal",
-          tab: "New tab",
-          split: "Split to the right",
-          "split-bottom": "Split to the bottom"
+          tab: "New tab"
         }
       }
     ];
@@ -151,7 +148,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
   }
   getOpenBehavior() {
     const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
-    return ["active", "modal", "tab", "split", "split-bottom"].includes(v) ? v : "modal";
+    return ["active", "modal", "tab"].includes(v) ? v : "modal";
   }
   detectColumnProperty() {
     const entries = this.data?.data ?? [];
@@ -371,14 +368,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (typeof val === "number") return String(val);
     return file.basename;
   }
-  /** Check if a leaf is still part of the workspace. */
-  isLeafAttached(leaf) {
-    let found = false;
-    this.app.workspace.iterateAllLeaves((l) => {
-      if (l === leaf) found = true;
-    });
-    return found;
-  }
   // -----------------------------------------------------------------------
   //  Open file
   // -----------------------------------------------------------------------
@@ -404,18 +393,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
       case "tab": {
         this.app.workspace.getLeaf(true).openFile(file);
-        break;
-      }
-      case "split":
-      case "split-bottom": {
-        const dir = behavior === "split-bottom" ? "horizontal" : "vertical";
-        if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-          void this.splitLeaf.openFile(file);
-        } else {
-          this.splitLeaf = this.app.workspace.getLeaf("split", dir);
-          void this.splitLeaf.openFile(file);
-        }
-        this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
         break;
       }
     }

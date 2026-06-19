@@ -5,7 +5,6 @@ import {
   BasesEntry,
   QueryController,
   TFile,
-  WorkspaceLeaf,
   Menu,
   Modal,
   MarkdownRenderer,
@@ -60,7 +59,6 @@ class ColumnsView extends BasesView {
 
   activeFilters: Set<string> = new Set();
   andMode = true;
-  private splitLeaf: WorkspaceLeaf | null = null;
 
   constructor(
     controller: QueryController,
@@ -134,8 +132,6 @@ class ColumnsView extends BasesView {
           active: "Active pane",
           modal: "Floating modal",
           tab: "New tab",
-          split: "Split to the right",
-          "split-bottom": "Split to the bottom",
         },
       },
     ];
@@ -179,7 +175,7 @@ class ColumnsView extends BasesView {
 
   private getOpenBehavior(): string {
     const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
-    return ["active", "modal", "tab", "split", "split-bottom"].includes(v) ? v : "modal";
+    return ["active", "modal", "tab"].includes(v) ? v : "modal";
   }
 
   private detectColumnProperty(): string {
@@ -221,9 +217,7 @@ class ColumnsView extends BasesView {
       if (id.startsWith("file.")) return false;
       const parsed = parsePropertyId(id);
       if (!parsed) return false;
-      // Skip the column property itself (already shown as column header)
       if (parsed.name === columnProp) return false;
-      // Skip the title property (already shown as card title)
       const titleProp = this.getTitleProperty();
       if (titleProp && parsed.name === titleProp) return false;
       return true;
@@ -470,15 +464,6 @@ class ColumnsView extends BasesView {
     return file.basename;
   }
 
-  /** Check if a leaf is still part of the workspace. */
-  private isLeafAttached(leaf: WorkspaceLeaf): boolean {
-    let found = false;
-    this.app.workspace.iterateAllLeaves((l) => {
-      if (l === leaf) found = true;
-    });
-    return found;
-  }
-
   // -----------------------------------------------------------------------
   //  Open file
   // -----------------------------------------------------------------------
@@ -508,18 +493,6 @@ class ColumnsView extends BasesView {
       }
       case "tab": {
         this.app.workspace.getLeaf(true).openFile(file);
-        break;
-      }
-      case "split":
-      case "split-bottom": {
-        const dir: any = behavior === "split-bottom" ? "horizontal" : "vertical";
-        if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-          void this.splitLeaf.openFile(file);
-        } else {
-          this.splitLeaf = this.app.workspace.getLeaf("split", dir);
-          void this.splitLeaf.openFile(file);
-        }
-        this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
         break;
       }
     }
