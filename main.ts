@@ -49,7 +49,7 @@ class ColumnsView extends BasesView {
   plugin: ColumnsPlugin;
 
   activeFilters: Set<string> = new Set();
-  andMode = true;
+  andMode = false;
 
   constructor(
     controller: QueryController,

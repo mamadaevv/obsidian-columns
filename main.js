@@ -42,7 +42,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     super(controller);
     this.type = "columns";
     this.activeFilters = /* @__PURE__ */ new Set();
-    this.andMode = true;
+    this.andMode = false;
     this.scrollEl = scrollEl;
     this.plugin = plugin;
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
