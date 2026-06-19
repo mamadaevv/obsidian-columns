@@ -5,8 +5,9 @@
 .columns-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 /* ---------------------------------------------------------------------------
@@ -74,7 +75,9 @@
   flex: 1;
   gap: 12px;
   padding: 12px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: flex-start;
 }
 
 /* ---------------------------------------------------------------------------
