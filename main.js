@@ -374,9 +374,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
   openFile(file) {
     const behavior = this.getOpenBehavior();
     if (behavior === "active" || behavior === "tab") {
-      const open = this.app.workspace.getLeavesOfType("markdown").find(
-        (l) => l.view?.file?.path === file.path
-      );
+      let open = null;
+      this.app.workspace.iterateAllLeaves((l) => {
+        if (l.view?.file?.path === file.path) {
+          open = l;
+        }
+      });
       if (open) {
         this.app.workspace.setActiveLeaf(open, { focus: true });
         return;

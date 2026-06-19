@@ -5,6 +5,7 @@ import {
   BasesEntry,
   QueryController,
   TFile,
+  WorkspaceLeaf,
   Menu,
   Modal,
   MarkdownRenderer,
@@ -473,9 +474,12 @@ class ColumnsView extends BasesView {
 
     // For tab/active: navigate if already open
     if (behavior === "active" || behavior === "tab") {
-      const open = this.app.workspace.getLeavesOfType("markdown").find(
-        (l) => (l.view as any)?.file?.path === file.path,
-      );
+      let open: WorkspaceLeaf | null = null;
+      this.app.workspace.iterateAllLeaves((l) => {
+        if ((l.view as any)?.file?.path === file.path) {
+          open = l;
+        }
+      });
       if (open) {
         this.app.workspace.setActiveLeaf(open, { focus: true });
         return;
