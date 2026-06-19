@@ -188,6 +188,14 @@ class ColumnsView extends BasesView {
     return fromProp ?? null;
   }
 
+  /** Get the title property as a full BasesPropertyId (e.g. "note.status"). */
+  private getTitlePropertyId(): string | null {
+    const raw = this.config?.get(CFG_TITLE_PROP);
+    if (typeof raw === "string") return raw;
+    const id = this.config?.getAsPropertyId(CFG_TITLE_PROP);
+    return id ?? null;
+  }
+
   private getColumnWidth(): number {
     const v = this.cfg<number>(CFG_COL_WIDTH, 300);
     return v >= 150 && v <= 500 ? v : 300;
@@ -444,9 +452,12 @@ class ColumnsView extends BasesView {
 
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
 
-    // Title
+    // Title — use entry.getValue() for the title property ID
+    const titlePropId = this.getTitlePropertyId();
+    const title = titlePropId
+      ? entry.getValue(titlePropId as any)?.toString() ?? file.basename
+      : file.basename;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
-    const title = this.getCardTitle(file);
     titleEl.textContent = title;
 
     // Visible property chips

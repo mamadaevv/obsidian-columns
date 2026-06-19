@@ -156,6 +156,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const fromProp = this.propKey(CFG_TITLE_PROP);
     return fromProp ?? null;
   }
+  /** Get the title property as a full BasesPropertyId (e.g. "note.status"). */
+  getTitlePropertyId() {
+    const raw = this.config?.get(CFG_TITLE_PROP);
+    if (typeof raw === "string") return raw;
+    const id = this.config?.getAsPropertyId(CFG_TITLE_PROP);
+    return id ?? null;
+  }
   getColumnWidth() {
     const v = this.cfg(CFG_COL_WIDTH, 300);
     return v >= 150 && v <= 500 ? v : 300;
@@ -350,8 +357,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const file = entry.file;
     if (!(file instanceof import_obsidian.TFile)) return;
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
+    const titlePropId = this.getTitlePropertyId();
+    const title = titlePropId ? entry.getValue(titlePropId)?.toString() ?? file.basename : file.basename;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
-    const title = this.getCardTitle(file);
     titleEl.textContent = title;
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
