@@ -516,18 +516,9 @@ class ColumnsView extends BasesView {
         if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
           this.splitLeaf.detach();
         }
-        // Find our own leaf and split from it
-        let myLeaf: WorkspaceLeaf | null = null;
-        this.app.workspace.iterateAllLeaves((l) => {
-          if ((l.view as any)?.type === this.type && l.view === this) {
-            myLeaf = l;
-          }
-        });
         const dir: any = behavior === "split-bottom" ? "horizontal" : "vertical";
-        if (myLeaf) {
-          this.splitLeaf = this.app.workspace.createLeafBySplit(myLeaf, dir, false);
-          void this.splitLeaf.openFile(file);
-        }
+        this.splitLeaf = this.app.workspace.getLeaf("split", dir);
+        this.splitLeaf.openFile(file);
         break;
       }
     }
