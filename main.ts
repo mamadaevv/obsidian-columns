@@ -511,12 +511,12 @@ class ColumnsView extends BasesView {
         break;
       }
       case "split": {
+        // Close previous file before opening new one to avoid race
         if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-          this.splitLeaf.openFile(file);
-        } else {
-          this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
-          this.splitLeaf.openFile(file);
+          this.splitLeaf.detach();
         }
+        this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
+        this.splitLeaf.openFile(file);
         break;
       }
     }

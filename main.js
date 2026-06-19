@@ -408,11 +408,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
       case "split": {
         if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-          this.splitLeaf.openFile(file);
-        } else {
-          this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
-          this.splitLeaf.openFile(file);
+          this.splitLeaf.detach();
         }
+        this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
+        this.splitLeaf.openFile(file);
         break;
       }
     }
