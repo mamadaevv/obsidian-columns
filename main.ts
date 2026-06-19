@@ -61,7 +61,6 @@ class ColumnsView extends BasesView {
   activeFilters: Set<string> = new Set();
   andMode = true;
   private splitLeaf: WorkspaceLeaf | null = null;
-  private splitQueue = Promise.resolve();
 
   constructor(
     controller: QueryController,
@@ -449,7 +448,6 @@ class ColumnsView extends BasesView {
     }
 
     cardEl.addEventListener("click", (e) => {
-      e.stopPropagation();
       this.openFile(file);
     });
 
@@ -479,21 +477,6 @@ class ColumnsView extends BasesView {
       if (l === leaf) found = true;
     });
     return found;
-  }
-
-  /** Wait until a leaf's view is fully loaded (not DeferredView). */
-  private waitForLeafReady(leaf: WorkspaceLeaf): Promise<void> {
-    return new Promise((resolve) => {
-      const check = () => {
-        const v = (leaf.view as any);
-        if (v && v.getViewType && v.getViewType() !== "empty") {
-          resolve();
-        } else {
-          requestAnimationFrame(check);
-        }
-      };
-      check();
-    });
   }
 
   // -----------------------------------------------------------------------
@@ -529,17 +512,13 @@ class ColumnsView extends BasesView {
       }
       case "split":
       case "split-bottom": {
-        this.splitQueue = this.splitQueue.then(async () => {
-          if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-            await this.splitLeaf.openFile(file);
-          } else {
-            const dir: any = behavior === "split-bottom" ? "horizontal" : "vertical";
-            this.splitLeaf = this.app.workspace.getLeaf("split", dir);
-            // Wait until the leaf has a real view (not DeferredView)
-            await this.waitForLeafReady(this.splitLeaf);
-            await this.splitLeaf.openFile(file);
-          }
-        }).catch(() => {});
+        const dir: any = behavior === "split-bottom" ? "horizontal" : "vertical";
+        if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
+          void this.splitLeaf.openFile(file);
+        } else {
+          this.splitLeaf = this.app.workspace.getLeaf("split", dir);
+          void this.splitLeaf.openFile(file);
+        }
         break;
       }
     }

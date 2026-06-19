@@ -54,7 +54,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.activeFilters = /* @__PURE__ */ new Set();
     this.andMode = true;
     this.splitLeaf = null;
-    this.splitQueue = Promise.resolve();
     this.scrollEl = scrollEl;
     this.plugin = plugin;
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
@@ -354,7 +353,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
       chip.textContent = `${label}: ${val.toString()}`;
     }
     cardEl.addEventListener("click", (e) => {
-      e.stopPropagation();
       this.openFile(file);
     });
     cardEl.addEventListener("contextmenu", (e) => {
@@ -380,20 +378,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
       if (l === leaf) found = true;
     });
     return found;
-  }
-  /** Wait until a leaf's view is fully loaded (not DeferredView). */
-  waitForLeafReady(leaf) {
-    return new Promise((resolve) => {
-      const check = () => {
-        const v = leaf.view;
-        if (v && v.getViewType && v.getViewType() !== "empty") {
-          resolve();
-        } else {
-          requestAnimationFrame(check);
-        }
-      };
-      check();
-    });
   }
   // -----------------------------------------------------------------------
   //  Open file
@@ -424,17 +408,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
       case "split":
       case "split-bottom": {
-        this.splitQueue = this.splitQueue.then(async () => {
-          if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
-            await this.splitLeaf.openFile(file);
-          } else {
-            const dir = behavior === "split-bottom" ? "horizontal" : "vertical";
-            this.splitLeaf = this.app.workspace.getLeaf("split", dir);
-            await this.waitForLeafReady(this.splitLeaf);
-            await this.splitLeaf.openFile(file);
-          }
-        }).catch(() => {
-        });
+        const dir = behavior === "split-bottom" ? "horizontal" : "vertical";
+        if (this.splitLeaf && this.isLeafAttached(this.splitLeaf)) {
+          void this.splitLeaf.openFile(file);
+        } else {
+          this.splitLeaf = this.app.workspace.getLeaf("split", dir);
+          void this.splitLeaf.openFile(file);
+        }
         break;
       }
     }
