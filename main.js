@@ -66,6 +66,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
       })
     );
     this.render();
+    setTimeout(() => this.render(), 0);
   }
   onunload() {
   }

@@ -74,8 +74,7 @@ class ColumnsView extends BasesView {
   }
 
   onload(): void {
-    // Re-render when the user saves gear-menu config (rarely — only on .base
-    // file writes), but debounce to avoid thrash on rapid vault edits.
+    // Debounced re-render when .base config is saved to disk
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     this.registerEvent(
       this.app.vault.on("modify", () => {
@@ -84,6 +83,9 @@ class ColumnsView extends BasesView {
       }),
     );
     this.render();
+    // Re-render once config is fully loaded (custom keys may be undefined
+    // during the first render from onload)
+    setTimeout(() => this.render(), 0);
   }
 
   onunload(): void {}
