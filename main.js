@@ -187,11 +187,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (typeof raw === "number") return [String(raw)];
     return [];
   }
-  /** Get visible properties from the Properties button, skip file props and column prop. */
+  /** Get visible properties from the Properties button, skip column prop and title prop. */
   getVisiblePropertyIds(columnProp) {
-    const props = this.data?.properties ?? [];
+    const props = this.config?.getOrder() ?? [];
     return props.filter((id) => {
-      if (id.startsWith("file.")) return false;
       const parsed = (0, import_obsidian.parsePropertyId)(id);
       if (!parsed) return false;
       if (parsed.name === columnProp) return false;

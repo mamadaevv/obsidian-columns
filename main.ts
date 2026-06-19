@@ -226,11 +226,10 @@ class ColumnsView extends BasesView {
     return [];
   }
 
-  /** Get visible properties from the Properties button, skip file props and column prop. */
+  /** Get visible properties from the Properties button, skip column prop and title prop. */
   private getVisiblePropertyIds(columnProp: string): string[] {
-    const props = this.data?.properties ?? [];
+    const props = this.config?.getOrder() ?? [];
     return props.filter((id) => {
-      if (id.startsWith("file.")) return false;
       const parsed = parsePropertyId(id);
       if (!parsed) return false;
       if (parsed.name === columnProp) return false;
