@@ -61,6 +61,7 @@ class ColumnsView extends BasesView {
 
   activeFilters: Set<string> = new Set();
   andMode = true;
+  private titlePropIdCached: string | null = null;
 
   constructor(
     controller: QueryController,
@@ -99,8 +100,26 @@ class ColumnsView extends BasesView {
   }
 
   onDataUpdated(): void {
+    // Refresh cached config values that may not be available during onload
+    this.titlePropIdCached = this.getTitlePropertyId();
     this.render();
   }
+
+  onload(): void {
+    this.titlePropIdCached = this.getTitlePropertyId();
+    // Re-render when .base config is saved to disk
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    this.registerEvent(
+      this.app.vault.on("modify", () => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => this.render(), 200);
+      }),
+    );
+    this.render();
+    setTimeout(() => this.render(), 0);
+  }
+
+  onunload(): void {}
 
   // -----------------------------------------------------------------------
   //  View options (gear menu)

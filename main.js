@@ -53,6 +53,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.type = "columns";
     this.activeFilters = /* @__PURE__ */ new Set();
     this.andMode = true;
+    this.titlePropIdCached = null;
     this.scrollEl = scrollEl;
     this.plugin = plugin;
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
@@ -77,7 +78,22 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.containerEl.focus({ preventScroll: true });
   }
   onDataUpdated() {
+    this.titlePropIdCached = this.getTitlePropertyId();
     this.render();
+  }
+  onload() {
+    this.titlePropIdCached = this.getTitlePropertyId();
+    let debounceTimer = null;
+    this.registerEvent(
+      this.app.vault.on("modify", () => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => this.render(), 200);
+      })
+    );
+    this.render();
+    setTimeout(() => this.render(), 0);
+  }
+  onunload() {
   }
   // -----------------------------------------------------------------------
   //  View options (gear menu)
