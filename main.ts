@@ -123,7 +123,7 @@ class ColumnsView extends BasesView {
         key: CFG_OPEN_BEHAVIOR,
         type: "dropdown",
         displayName: "Open card in",
-        default: "modal",
+        default: "active",
         options: {
           active: "Active pane",
           modal: "Floating modal",
@@ -190,8 +190,8 @@ class ColumnsView extends BasesView {
   }
 
   private getOpenBehavior(): string {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
-    return ["active", "modal", "tab"].includes(v) ? v : "modal";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "active");
+    return ["active", "modal", "tab"].includes(v) ? v : "active";
   }
 
   private detectColumnProperty(): string {

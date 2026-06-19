@@ -102,7 +102,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
         key: CFG_OPEN_BEHAVIOR,
         type: "dropdown",
         displayName: "Open card in",
-        default: "modal",
+        default: "active",
         options: {
           active: "Active pane",
           modal: "Floating modal",
@@ -160,8 +160,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     return v >= 150 && v <= 500 ? v : 300;
   }
   getOpenBehavior() {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
-    return ["active", "modal", "tab"].includes(v) ? v : "modal";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "active");
+    return ["active", "modal", "tab"].includes(v) ? v : "active";
   }
   detectColumnProperty() {
     const entries = this.data?.data ?? [];
