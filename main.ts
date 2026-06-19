@@ -3,6 +3,7 @@ import {
   BasesView,
   BasesAllOptions,
   BasesEntry,
+  NullValue,
   QueryController,
   TFile,
   WorkspaceLeaf,
@@ -449,7 +450,7 @@ class ColumnsView extends BasesView {
     // Visible property chips
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
-      if (val == null) continue;
+      if (val == null || val instanceof NullValue) continue;
       const chip = cardEl.createSpan({ cls: "columns-card-chip" });
       const parsed = parsePropertyId(propId);
       const label = parsed?.name ?? propId;

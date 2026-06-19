@@ -353,7 +353,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     titleEl.textContent = title;
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
-      if (val == null) continue;
+      if (val == null || val instanceof import_obsidian.NullValue) continue;
       const chip = cardEl.createSpan({ cls: "columns-card-chip" });
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = parsed?.name ?? propId;
