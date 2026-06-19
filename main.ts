@@ -73,6 +73,11 @@ class ColumnsView extends BasesView {
   }
 
   onload(): void {
+    // Re-render when the user closes the settings pane (config may have
+    // changed without triggering onDataUpdated)
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => this.render()),
+    );
     this.render();
   }
 

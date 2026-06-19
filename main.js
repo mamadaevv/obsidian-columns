@@ -58,6 +58,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
   }
   onload() {
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => this.render())
+    );
     this.render();
   }
   onunload() {
