@@ -415,6 +415,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
           this.splitLeaf = this.app.workspace.getLeaf("split", dir);
           void this.splitLeaf.openFile(file);
         }
+        this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
         break;
       }
     }

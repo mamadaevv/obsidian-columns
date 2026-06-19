@@ -519,6 +519,7 @@ class ColumnsView extends BasesView {
           this.splitLeaf = this.app.workspace.getLeaf("split", dir);
           void this.splitLeaf.openFile(file);
         }
+        this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
         break;
       }
     }
