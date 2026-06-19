@@ -99,27 +99,21 @@ var ColumnsView = class extends import_obsidian.BasesView {
         step: 10
       },
       {
-        type: "group",
-        displayName: "Card",
-        items: [
-          {
-            key: CFG_OPEN_BEHAVIOR,
-            type: "dropdown",
-            displayName: "Open card in",
-            default: "modal",
-            options: {
-              active: "Active pane",
-              modal: "Floating modal",
-              tab: "New tab"
-            }
-          },
-          {
-            key: CFG_TITLE_PROP,
-            type: "property",
-            displayName: "Card title property",
-            placeholder: "File name"
-          }
-        ]
+        key: CFG_OPEN_BEHAVIOR,
+        type: "dropdown",
+        displayName: "Open card in",
+        default: "modal",
+        options: {
+          active: "Active pane",
+          modal: "Floating modal",
+          tab: "New tab"
+        }
+      },
+      {
+        displayName: "Card title property",
+        type: "property",
+        key: CFG_TITLE_PROP,
+        placeholder: "File name"
       }
     ];
   }
