@@ -375,9 +375,20 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const prop = this.getTitleProperty();
     if (!prop) return file.basename;
     const cache = this.app.metadataCache.getFileCache(file);
-    const val = cache?.frontmatter?.[prop];
+    let val = cache?.frontmatter?.[prop];
     if (typeof val === "string") return val;
     if (typeof val === "number") return String(val);
+    if (this.data?.data) {
+      for (const entry of this.data.data) {
+        if (entry.file?.path === file.path) {
+          const entryVal = entry.getValue(`note.${prop}`);
+          if (entryVal && typeof entryVal.toString() === "string" && entryVal.toString().length > 0) {
+            return entryVal.toString();
+          }
+          break;
+        }
+      }
+    }
     return file.basename;
   }
   // -----------------------------------------------------------------------
