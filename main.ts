@@ -153,10 +153,19 @@ class ColumnsView extends BasesView {
   }
 
   private propKey(key: string): string | null {
+    // Try property-ID API first
     const id = this.config?.getAsPropertyId(key);
-    if (!id) return null;
-    const parsed = parsePropertyId(id);
-    return parsed?.name ?? null;
+    if (id) {
+      const parsed = parsePropertyId(id);
+      if (parsed?.name) return parsed.name;
+    }
+    // Fallback: read raw and parse
+    const raw = this.config?.get(key);
+    if (typeof raw === "string") {
+      const parsed = parsePropertyId(raw as any);
+      return parsed?.name ?? raw;
+    }
+    return null;
   }
 
   private getSourceFolder(): string {
