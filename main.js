@@ -376,9 +376,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (behavior === "active" || behavior === "tab") {
       let open = null;
       this.app.workspace.iterateAllLeaves((l) => {
-        if (l.view?.file?.path === file.path) {
-          open = l;
-        }
+        const leafFile = l.view?.file;
+        const leafPath = typeof leafFile === "string" ? leafFile : typeof leafFile?.path === "string" ? leafFile.path : void 0;
+        if (leafPath === file.path) open = l;
       });
       if (open) {
         this.app.workspace.setActiveLeaf(open, { focus: true });

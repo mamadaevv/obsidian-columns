@@ -476,9 +476,14 @@ class ColumnsView extends BasesView {
     if (behavior === "active" || behavior === "tab") {
       let open: WorkspaceLeaf | null = null;
       this.app.workspace.iterateAllLeaves((l) => {
-        if ((l.view as any)?.file?.path === file.path) {
-          open = l;
-        }
+        const leafFile = (l.view as any)?.file;
+        const leafPath =
+          typeof leafFile === "string"
+            ? leafFile
+            : typeof leafFile?.path === "string"
+              ? leafFile.path
+              : undefined;
+        if (leafPath === file.path) open = l;
       });
       if (open) {
         this.app.workspace.setActiveLeaf(open, { focus: true });
