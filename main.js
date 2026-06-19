@@ -79,7 +79,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
         key: CFG_OPEN_BEHAVIOR,
         type: "dropdown",
         displayName: "Open card in",
-        default: "active",
+        default: "tab",
         options: {
           active: "Active pane",
           modal: "Floating modal",
@@ -138,8 +138,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     return v >= 150 && v <= 500 ? v : 300;
   }
   getOpenBehavior() {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "active");
-    return ["active", "modal", "tab"].includes(v) ? v : "active";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "tab");
+    return ["active", "modal", "tab"].includes(v) ? v : "tab";
   }
   /** Collect column values from a file's frontmatter. */
   getColumnValues(file, prop) {
@@ -278,8 +278,16 @@ var ColumnsView = class extends import_obsidian.BasesView {
       });
       pill.textContent = tag;
       pill.addEventListener("click", (e) => {
-        this.activeFilters.clear();
-        this.activeFilters.add(tag);
+        if (e.ctrlKey || e.metaKey) {
+          if (this.activeFilters.has(tag)) {
+            this.activeFilters.delete(tag);
+          } else {
+            this.activeFilters.add(tag);
+          }
+        } else {
+          this.activeFilters.clear();
+          this.activeFilters.add(tag);
+        }
         this.render();
       });
       pill.addEventListener("contextmenu", (e) => {
@@ -326,7 +334,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
       chip.textContent = `${label}: ${val.toString()}`;
     }
     cardEl.addEventListener("click", (e) => {
-      this.openFile(file);
+      if (e.ctrlKey || e.metaKey) {
+        const leaf = this.app.workspace.getLeaf(true);
+        leaf.openFile(file);
+      } else {
+        this.openFile(file);
+      }
     });
     cardEl.addEventListener("contextmenu", (e) => {
       e.preventDefault();

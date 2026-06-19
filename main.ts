@@ -99,7 +99,7 @@ class ColumnsView extends BasesView {
         key: CFG_OPEN_BEHAVIOR,
         type: "dropdown",
         displayName: "Open card in",
-        default: "active",
+        default: "tab",
         options: {
           active: "Active pane",
           modal: "Floating modal",
@@ -167,8 +167,8 @@ class ColumnsView extends BasesView {
   }
 
   private getOpenBehavior(): string {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "active");
-    return ["active", "modal", "tab"].includes(v) ? v : "active";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "tab");
+    return ["active", "modal", "tab"].includes(v) ? v : "tab";
   }
 
   /** Collect column values from a file's frontmatter. */
@@ -343,8 +343,17 @@ class ColumnsView extends BasesView {
       });
       pill.textContent = tag;
       pill.addEventListener("click", (e) => {
-        this.activeFilters.clear();
-        this.activeFilters.add(tag);
+        if (e.ctrlKey || e.metaKey) {
+          // Ctrl+click = toggle (same as right-click)
+          if (this.activeFilters.has(tag)) {
+            this.activeFilters.delete(tag);
+          } else {
+            this.activeFilters.add(tag);
+          }
+        } else {
+          this.activeFilters.clear();
+          this.activeFilters.add(tag);
+        }
         this.render();
       });
       pill.addEventListener("contextmenu", (e) => {
@@ -415,7 +424,13 @@ class ColumnsView extends BasesView {
     }
 
     cardEl.addEventListener("click", (e) => {
-      this.openFile(file);
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl+click — open in background tab
+        const leaf = this.app.workspace.getLeaf(true);
+        leaf.openFile(file);
+      } else {
+        this.openFile(file);
+      }
     });
 
     cardEl.addEventListener("contextmenu", (e) => {
