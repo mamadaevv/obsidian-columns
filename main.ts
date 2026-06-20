@@ -99,15 +99,6 @@ class ColumnsView extends BasesView {
   static getViewOptions(): BasesAllOptions[] {
     return [
       {
-        key: CFG_COL_WIDTH,
-        type: "slider",
-        displayName: "Column width (px)",
-        default: 300,
-        min: 150,
-        max: 500,
-        step: 10,
-      },
-      {
         key: CFG_OPEN_BEHAVIOR,
         type: "dropdown",
         displayName: "Open card in",
@@ -153,6 +144,15 @@ class ColumnsView extends BasesView {
         type: "text",
         displayName: "Date & time format",
         placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
+      },
+      {
+        key: CFG_COL_WIDTH,
+        type: "slider",
+        displayName: "Column width (px)",
+        default: 300,
+        min: 150,
+        max: 500,
+        step: 10,
       },
     ];
   }
