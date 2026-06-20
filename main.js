@@ -431,9 +431,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const chip = chipsEl.createDiv({ cls: "columns-card-chip" });
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
+      const isTagProp = parsed?.name === "tags";
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label;
-      this.renderChipValue(chip, val, file);
+      this.renderChipValue(chip, val, file, isTagProp);
     }
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -451,7 +452,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     });
   }
   /** Render a chip value based on its Obsidian Value type. */
-  renderChipValue(chip, val, sourceFile) {
+  renderChipValue(chip, val, sourceFile, isTagProp = false) {
     if (val instanceof import_obsidian.BooleanValue) {
       const iconEl = chip.createSpan({ cls: "columns-chip-boolean" });
       (0, import_obsidian.setIcon)(iconEl, val.toString() === "true" ? "square-check-big" : "square");
@@ -487,11 +488,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
     if (val instanceof import_obsidian.ListValue) {
       const row = chip.createDiv({ cls: "columns-chip-tag-row" });
+      const pillCls = isTagProp ? "columns-chip-tag" : "columns-chip-list-item";
       const len = val.length();
       for (let i = 0; i < len; i++) {
         const item = val.get(i);
         if (!item || item instanceof import_obsidian.NullValue || !item.isTruthy()) continue;
-        const pill = row.createSpan({ cls: "columns-chip-tag" });
+        const pill = row.createSpan({ cls: pillCls });
         if (item instanceof import_obsidian.LinkValue) {
           const raw = item.toString();
           const m = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);

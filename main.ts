@@ -527,9 +527,10 @@ class ColumnsView extends BasesView {
       const chip = chipsEl.createDiv({ cls: "columns-card-chip" });
       const parsed = parsePropertyId(propId);
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
+      const isTagProp = parsed?.name === "tags";
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label;
-      this.renderChipValue(chip, val, file);
+      this.renderChipValue(chip, val, file, isTagProp);
     }
 
     // Click events...
@@ -553,7 +554,7 @@ class ColumnsView extends BasesView {
   }
 
   /** Render a chip value based on its Obsidian Value type. */
-  private renderChipValue(chip: HTMLElement, val: Value, sourceFile: TFile): void {
+  private renderChipValue(chip: HTMLElement, val: Value, sourceFile: TFile, isTagProp = false): void {
     if (val instanceof BooleanValue) {
       const iconEl = chip.createSpan({ cls: "columns-chip-boolean" });
       setIcon(iconEl, val.toString() === "true" ? "square-check-big" : "square");
@@ -595,11 +596,12 @@ class ColumnsView extends BasesView {
     }
     if (val instanceof ListValue) {
       const row = chip.createDiv({ cls: "columns-chip-tag-row" });
+      const pillCls = isTagProp ? "columns-chip-tag" : "columns-chip-list-item";
       const len = val.length();
       for (let i = 0; i < len; i++) {
         const item = val.get(i);
         if (!item || item instanceof NullValue || !item.isTruthy()) continue;
-        const pill = row.createSpan({ cls: "columns-chip-tag" });
+        const pill = row.createSpan({ cls: pillCls });
         // Check if item is a link — render as clickable link tag
         if (item instanceof LinkValue) {
           const raw = item.toString();

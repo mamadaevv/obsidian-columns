@@ -203,7 +203,8 @@
 .columns-chips.is-clip .columns-chip-text,
 .columns-chips.is-clip .columns-chip-boolean,
 .columns-chips.is-clip .columns-chip-link,
-.columns-chips.is-clip .columns-chip-tag {
+.columns-chips.is-clip .columns-chip-tag,
+.columns-chips.is-clip .columns-chip-list-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
