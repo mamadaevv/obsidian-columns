@@ -71,8 +71,8 @@
 .columns-board {
   display: flex;
   flex: 1;
-  gap: 12px;
-  padding: 12px 12px 0;
+  gap: 16px;
+  padding: 16px 16px 0;
   overflow-x: auto;
   overflow-y: hidden;
   align-items: flex-start;
