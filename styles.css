@@ -88,7 +88,7 @@
   min-width: 180px;
   max-width: 500px;
   background: var(--background-secondary);
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--background-modifier-border);
   max-height: 100%;
   padding-bottom: 12px;
@@ -141,7 +141,7 @@
 
 .columns-card {
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   user-select: none;
   background: var(--background-primary);
