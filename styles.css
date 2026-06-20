@@ -181,7 +181,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+}
+
+.columns-card-title.is-normal-weight {
+  font-weight: 400;
 }
 
 .columns-card-title.is-wrap {
@@ -213,7 +217,7 @@
 }
 
 .columns-card-chip + .columns-card-chip {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .columns-card-chip-label {

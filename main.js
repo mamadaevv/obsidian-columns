@@ -31,6 +31,7 @@ var CFG_WRAP_TITLE = "wrapTitle";
 var CFG_WRAP_VALUES = "wrapValues";
 var CFG_DATE_FORMAT_D = "dateFormatDate";
 var CFG_DATE_FORMAT_DT = "dateFormatDatetime";
+var CFG_BOLD_TITLE = "boldTitle";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -101,6 +102,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
         type: "toggle",
         displayName: "Wrap card titles",
         default: false
+      },
+      {
+        key: CFG_BOLD_TITLE,
+        type: "toggle",
+        displayName: "Bold card titles",
+        default: true
       },
       {
         key: CFG_WRAP_VALUES,
@@ -353,6 +360,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const titlePropId = this.getTitlePropertyId();
     const title = titlePropId ? entry.getValue(titlePropId)?.toString() ?? file.basename : file.name;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
+    if (!this.cfg(CFG_BOLD_TITLE, true)) titleEl.addClass("is-normal-weight");
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);

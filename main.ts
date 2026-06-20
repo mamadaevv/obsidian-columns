@@ -32,6 +32,7 @@ const CFG_WRAP_VALUES = "wrapValues";
 const CFG_DATE_FORMAT = "dateFormat";
 const CFG_DATE_FORMAT_D = "dateFormatDate";
 const CFG_DATE_FORMAT_DT = "dateFormatDatetime";
+const CFG_BOLD_TITLE = "boldTitle";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -128,6 +129,12 @@ class ColumnsView extends BasesView {
         type: "toggle",
         displayName: "Wrap card titles",
         default: false,
+      },
+      {
+        key: CFG_BOLD_TITLE,
+        type: "toggle",
+        displayName: "Bold card titles",
+        default: true,
       },
       {
         key: CFG_WRAP_VALUES,
@@ -448,6 +455,7 @@ class ColumnsView extends BasesView {
       ? entry.getValue(titlePropId as any)?.toString() ?? file.basename
       : file.name;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
+    if (!this.cfg(CFG_BOLD_TITLE, true)) titleEl.addClass("is-normal-weight");
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
 
