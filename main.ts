@@ -125,6 +125,24 @@ class ColumnsView extends BasesView {
         default: false,
       },
       {
+        key: CFG_BOLD_TITLE,
+        type: "toggle",
+        displayName: "Bold card titles",
+        default: true,
+      },
+      {
+        key: CFG_WRAP_VALUES,
+        type: "toggle",
+        displayName: "Wrap multi-line values",
+        default: false,
+      },
+      {
+        key: CFG_CHIP_GRID,
+        type: "toggle",
+        displayName: "Chip grid layout",
+        default: false,
+      },
+      {
         key: CFG_CHIP_FONT_SIZE,
         type: "slider",
         displayName: "Chip font size (px)",
@@ -318,9 +336,6 @@ class ColumnsView extends BasesView {
     // Render filter bar
     this.renderFilterBar(columnMap);
 
-    // Render settings bar
-    this.renderSettingsBar();
-
     // Build column display list — only show columns matching selected tags
     let colNames = Array.from(columnMap.keys()).sort();
     if (this.activeFilters.size > 0) {
@@ -419,44 +434,6 @@ class ColumnsView extends BasesView {
         this.render();
       });
     }
-  }
-
-  /** Render inline settings bar (grid, wrap, bold toggles). */
-  private renderSettingsBar(): void {
-    const barEl = this.containerEl.createDiv({ cls: "columns-settings-bar" });
-
-    // Chip layout dropdown
-    const layoutLabel = barEl.createSpan({ cls: "columns-settings-label" });
-    layoutLabel.textContent = "Layout:";
-    const layoutSelect = barEl.createEl("select");
-    const layoutOpts = ["Stack", "Grid"];
-    const curLayout = this.cfg(CFG_CHIP_GRID, false) ? "Grid" : "Stack";
-    for (const opt of layoutOpts) {
-      const option = layoutSelect.createEl("option");
-      option.textContent = opt;
-      option.value = opt;
-      if (opt === curLayout) option.selected = true;
-    }
-    layoutSelect.addEventListener("change", () => {
-      this.config?.set(CFG_CHIP_GRID, layoutSelect.value === "Grid");
-      this.render();
-    });
-
-    // Wrap toggle
-    const wrapBtn = barEl.createSpan({ cls: "columns-mode-btn" });
-    wrapBtn.textContent = this.cfg(CFG_WRAP_VALUES, false) ? "Wrap" : "Clip";
-    wrapBtn.addEventListener("click", () => {
-      this.config?.set(CFG_WRAP_VALUES, !this.cfg(CFG_WRAP_VALUES, false));
-      this.render();
-    });
-
-    // Bold toggle
-    const boldBtn = barEl.createSpan({ cls: "columns-mode-btn" });
-    boldBtn.textContent = this.cfg(CFG_BOLD_TITLE, true) ? "Bold" : "Normal";
-    boldBtn.addEventListener("click", () => {
-      this.config?.set(CFG_BOLD_TITLE, !this.cfg(CFG_BOLD_TITLE, true));
-      this.render();
-    });
   }
 
   // -----------------------------------------------------------------------
