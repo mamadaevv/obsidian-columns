@@ -29,7 +29,8 @@ var CFG_COL_WIDTH = "columnWidth";
 var CFG_OPEN_BEHAVIOR = "openBehavior";
 var CFG_WRAP_TITLE = "wrapTitle";
 var CFG_WRAP_VALUES = "wrapValues";
-var CFG_DATE_FORMAT = "dateFormat";
+var CFG_DATE_FORMAT_D = "dateFormatDate";
+var CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -108,16 +109,16 @@ var ColumnsView = class extends import_obsidian.BasesView {
         default: false
       },
       {
-        key: CFG_DATE_FORMAT,
-        type: "dropdown",
+        key: CFG_DATE_FORMAT_D,
+        type: "text",
         displayName: "Date format",
-        default: "auto",
-        options: {
-          auto: "Automatic",
-          relative: "Relative (3 days ago)",
-          date: "Date only",
-          datetime: "Date and time"
-        }
+        placeholder: "Relative \u2014 e.g. DD-MM-YYYY"
+      },
+      {
+        key: CFG_DATE_FORMAT_DT,
+        type: "text",
+        displayName: "Date & time format",
+        placeholder: "Relative \u2014 e.g. DD-MM-YYYY HH:mm"
       }
     ];
   }
@@ -350,7 +351,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (!(file instanceof import_obsidian.TFile)) return;
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
     const titlePropId = this.getTitlePropertyId();
-    const title = titlePropId ? entry.getValue(titlePropId)?.toString() ?? file.basename : file.basename;
+    const title = titlePropId ? entry.getValue(titlePropId)?.toString() ?? file.basename : file.name;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
@@ -389,21 +390,18 @@ var ColumnsView = class extends import_obsidian.BasesView {
       return;
     }
     if (val instanceof import_obsidian.DateValue) {
-      const fmt = this.cfg(CFG_DATE_FORMAT, "auto");
+      const fmtD = this.cfg(CFG_DATE_FORMAT_D, "");
+      const fmtDT = this.cfg(CFG_DATE_FORMAT_DT, "");
       let text2;
-      switch (fmt) {
-        case "relative":
-          text2 = val.relative();
-          break;
-        case "date":
-          text2 = val.dateOnly().toString();
-          break;
-        case "datetime":
-          text2 = val.toString();
-          break;
-        default:
-          text2 = val.relative();
-          break;
+      const raw = val.toString();
+      const hasTime = raw.includes(":") || raw.includes("T");
+      const fmt = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
+      if (!fmt) {
+        text2 = val.relative();
+      } else {
+        const d = new Date(raw);
+        const pad = (n) => String(n).padStart(2, "0");
+        text2 = fmt.replace("YYYY", String(d.getFullYear())).replace("YY", String(d.getFullYear()).slice(-2)).replace("MM", pad(d.getMonth() + 1)).replace("DD", pad(d.getDate())).replace("HH", pad(d.getHours())).replace("mm", pad(d.getMinutes())).replace("ss", pad(d.getSeconds()));
       }
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text2;

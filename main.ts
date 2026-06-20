@@ -30,6 +30,8 @@ const CFG_OPEN_BEHAVIOR = "openBehavior";
 const CFG_WRAP_TITLE = "wrapTitle";
 const CFG_WRAP_VALUES = "wrapValues";
 const CFG_DATE_FORMAT = "dateFormat";
+const CFG_DATE_FORMAT_D = "dateFormatDate";
+const CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -134,16 +136,16 @@ class ColumnsView extends BasesView {
         default: false,
       },
       {
-        key: CFG_DATE_FORMAT,
-        type: "dropdown",
+        key: CFG_DATE_FORMAT_D,
+        type: "text",
         displayName: "Date format",
-        default: "auto",
-        options: {
-          auto: "Automatic",
-          relative: "Relative (3 days ago)",
-          date: "Date only",
-          datetime: "Date and time",
-        },
+        placeholder: "Relative — e.g. DD-MM-YYYY",
+      },
+      {
+        key: CFG_DATE_FORMAT_DT,
+        type: "text",
+        displayName: "Date & time format",
+        placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
       },
     ];
   }
@@ -444,7 +446,7 @@ class ColumnsView extends BasesView {
     const titlePropId = this.getTitlePropertyId();
     const title = titlePropId
       ? entry.getValue(titlePropId as any)?.toString() ?? file.basename
-      : file.basename;
+      : file.name;
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
@@ -491,13 +493,26 @@ class ColumnsView extends BasesView {
       return;
     }
     if (val instanceof DateValue) {
-      const fmt: string = this.cfg(CFG_DATE_FORMAT, "auto");
+      const fmtD: string = this.cfg(CFG_DATE_FORMAT_D, "");
+      const fmtDT: string = this.cfg(CFG_DATE_FORMAT_DT, "");
       let text: string;
-      switch (fmt) {
-        case "relative": text = val.relative(); break;
-        case "date": text = val.dateOnly().toString(); break;
-        case "datetime": text = val.toString(); break;
-        default: text = val.relative(); break;
+      const raw = val.toString();
+      const hasTime = raw.includes(":") || raw.includes("T");
+      const fmt: string = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
+      if (!fmt) {
+        text = val.relative();
+      } else {
+        // Basic format support: DD, MM, YYYY, HH, mm
+        const d = new Date(raw);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        text = fmt
+          .replace("YYYY", String(d.getFullYear()))
+          .replace("YY", String(d.getFullYear()).slice(-2))
+          .replace("MM", pad(d.getMonth() + 1))
+          .replace("DD", pad(d.getDate()))
+          .replace("HH", pad(d.getHours()))
+          .replace("mm", pad(d.getMinutes()))
+          .replace("ss", pad(d.getSeconds()));
       }
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text;

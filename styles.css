@@ -181,6 +181,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-bottom: 20px;
 }
 
 .columns-card-title.is-wrap {
