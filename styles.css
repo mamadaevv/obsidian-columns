@@ -210,10 +210,22 @@
   word-break: break-word;
 }
 
+.columns-chips.is-wrap .columns-chip-text,
+.columns-chips.is-wrap .columns-chip-boolean,
+.columns-chips.is-wrap .columns-chip-link,
+.columns-chips.is-wrap .columns-chip-tag,
+.columns-chips-grid.is-wrap .columns-chip-text,
+.columns-chips-grid.is-wrap .columns-chip-boolean,
+.columns-chips-grid.is-wrap .columns-chip-link,
+.columns-chips-grid.is-wrap .columns-chip-tag {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .columns-chips-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 12px;
+  gap: 16px;
   min-width: 0;
   font-size: var(--chip-fs);
 }
