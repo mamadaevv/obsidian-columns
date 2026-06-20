@@ -390,11 +390,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
       return;
     }
     if (val instanceof import_obsidian.ListValue) {
+      const row = chip.createDiv({ cls: "columns-chip-tag-row" });
       const len = val.length();
       for (let i = 0; i < len; i++) {
         const item = val.get(i);
         if (!item || item instanceof import_obsidian.NullValue || !item.isTruthy()) continue;
-        const pill = chip.createSpan({ cls: "columns-chip-tag" });
+        const pill = row.createSpan({ cls: "columns-chip-tag" });
         if (item instanceof import_obsidian.LinkValue) {
           const raw = item.toString();
           const m = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);

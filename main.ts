@@ -492,11 +492,12 @@ class ColumnsView extends BasesView {
       return;
     }
     if (val instanceof ListValue) {
+      const row = chip.createDiv({ cls: "columns-chip-tag-row" });
       const len = val.length();
       for (let i = 0; i < len; i++) {
         const item = val.get(i);
         if (!item || item instanceof NullValue || !item.isTruthy()) continue;
-        const pill = chip.createSpan({ cls: "columns-chip-tag" });
+        const pill = row.createSpan({ cls: "columns-chip-tag" });
         // Check if item is a link — render as clickable link tag
         if (item instanceof LinkValue) {
           const raw = item.toString();

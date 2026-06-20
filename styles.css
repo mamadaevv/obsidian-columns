@@ -251,8 +251,13 @@
   border-radius: 4px;
   background: var(--tag-background);
   color: var(--tag-color);
-  margin: 1px 0;
   align-self: flex-start;
+}
+
+.columns-chip-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
 }
 
 /* ---------------------------------------------------------------------------
