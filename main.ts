@@ -3,7 +3,11 @@ import {
   BasesView,
   BasesAllOptions,
   BasesEntry,
+  Value,
   NullValue,
+  BooleanValue,
+  LinkValue,
+  ListValue,
   QueryController,
   TFile,
   WorkspaceLeaf,
@@ -11,6 +15,7 @@ import {
   Modal,
   MarkdownRenderer,
   App,
+  setIcon,
   parsePropertyId,
 } from "obsidian";
 
@@ -419,7 +424,7 @@ class ColumnsView extends BasesView {
 
     const cardEl = cardsEl.createDiv({ cls: "columns-card" });
 
-    // Title — use entry.getValue() for the title property ID
+    // Title
     const titlePropId = this.getTitlePropertyId();
     const title = titlePropId
       ? entry.getValue(titlePropId as any)?.toString() ?? file.basename
@@ -433,15 +438,16 @@ class ColumnsView extends BasesView {
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;
-      const chip = cardEl.createSpan({ cls: "columns-card-chip" });
+      const chip = cardEl.createDiv({ cls: "columns-card-chip" });
       if (wrapValues) chip.addClass("is-wrap");
       const parsed = parsePropertyId(propId);
       const label = parsed?.name ?? propId;
-      const labelEl = chip.createSpan({ cls: "columns-card-chip-label" });
+      const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label;
-      const valEl = chip.createSpan({ cls: "columns-card-chip-value" });
-      valEl.textContent = val.toString();
+      this.renderChipValue(chip, val);
     }
+
+    // Click events...
 
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -459,6 +465,36 @@ class ColumnsView extends BasesView {
       this.app.workspace.trigger("file-menu", menu, file, "columns-cards");
       menu.showAtPosition({ x: e.clientX, y: e.clientY });
     });
+  }
+
+  /** Render a chip value based on its Obsidian Value type. */
+  private renderChipValue(chip: HTMLElement, val: Value): void {
+    if (val instanceof BooleanValue) {
+      const iconEl = chip.createSpan({ cls: "columns-chip-boolean" });
+      setIcon(iconEl, val.toString() === "true" ? "square-check-big" : "square");
+      return;
+    }
+    if (val instanceof LinkValue) {
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
+      const raw = val.toString();
+      const match = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);
+      if (match) linkEl.textContent = match[2] || match[1].split("/").pop()?.replace(/\.md$/, "") || raw;
+      else linkEl.textContent = raw;
+      return;
+    }
+    if (val instanceof ListValue) {
+      const len = val.length();
+      for (let i = 0; i < len; i++) {
+        const item = val.get(i);
+        if (!item || item instanceof NullValue || !item.isTruthy()) continue;
+        const pill = chip.createSpan({ cls: "columns-chip-tag" });
+        pill.textContent = item.toString();
+      }
+      return;
+    }
+    // Default: plain text
+    const textEl = chip.createSpan({ cls: "columns-chip-text" });
+    textEl.textContent = val.toString();
   }
 
   // -----------------------------------------------------------------------

@@ -344,14 +344,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof import_obsidian.NullValue) continue;
-      const chip = cardEl.createSpan({ cls: "columns-card-chip" });
+      const chip = cardEl.createDiv({ cls: "columns-card-chip" });
       if (wrapValues) chip.addClass("is-wrap");
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = parsed?.name ?? propId;
-      const labelEl = chip.createSpan({ cls: "columns-card-chip-label" });
+      const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label;
-      const valEl = chip.createSpan({ cls: "columns-card-chip-value" });
-      valEl.textContent = val.toString();
+      this.renderChipValue(chip, val);
     }
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -367,6 +366,34 @@ var ColumnsView = class extends import_obsidian.BasesView {
       this.app.workspace.trigger("file-menu", menu, file, "columns-cards");
       menu.showAtPosition({ x: e.clientX, y: e.clientY });
     });
+  }
+  /** Render a chip value based on its Obsidian Value type. */
+  renderChipValue(chip, val) {
+    if (val instanceof import_obsidian.BooleanValue) {
+      const iconEl = chip.createSpan({ cls: "columns-chip-boolean" });
+      (0, import_obsidian.setIcon)(iconEl, val.toString() === "true" ? "square-check-big" : "square");
+      return;
+    }
+    if (val instanceof import_obsidian.LinkValue) {
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
+      const raw = val.toString();
+      const match = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);
+      if (match) linkEl.textContent = match[2] || match[1].split("/").pop()?.replace(/\.md$/, "") || raw;
+      else linkEl.textContent = raw;
+      return;
+    }
+    if (val instanceof import_obsidian.ListValue) {
+      const len = val.length();
+      for (let i = 0; i < len; i++) {
+        const item = val.get(i);
+        if (!item || item instanceof import_obsidian.NullValue || !item.isTruthy()) continue;
+        const pill = chip.createSpan({ cls: "columns-chip-tag" });
+        pill.textContent = item.toString();
+      }
+      return;
+    }
+    const textEl = chip.createSpan({ cls: "columns-chip-text" });
+    textEl.textContent = val.toString();
   }
   // -----------------------------------------------------------------------
   //  Open file

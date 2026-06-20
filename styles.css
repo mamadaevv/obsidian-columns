@@ -160,7 +160,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .columns-card:hover {
@@ -174,6 +174,7 @@
 
 .columns-card-title {
   font-size: 14px;
+  font-weight: 700;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -201,13 +202,55 @@
   overflow: visible;
 }
 
-.columns-card-chip-label {
-  color: var(--text-muted);
+.columns-card-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
 }
 
-.columns-card-chip-value {
+.columns-card-chip-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.columns-chip-text,
+.columns-chip-boolean {
+  font-size: 13px;
   color: var(--text-normal);
-  margin-left: 3px;
+  line-height: 1.4;
+}
+
+.columns-chip-boolean {
+  display: inline-flex;
+  align-items: center;
+}
+
+.columns-chip-link {
+  font-size: 13px;
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.columns-chip-link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.columns-chip-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--tag-background);
+  color: var(--tag-color);
+  margin: 1px 0;
+  align-self: flex-start;
 }
 
 /* ---------------------------------------------------------------------------
