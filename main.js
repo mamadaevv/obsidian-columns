@@ -29,6 +29,7 @@ var CFG_COL_WIDTH = "columnWidth";
 var CFG_OPEN_BEHAVIOR = "openBehavior";
 var CFG_WRAP_TITLE = "wrapTitle";
 var CFG_WRAP_VALUES = "wrapValues";
+var CFG_DATE_FORMAT = "dateFormat";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -105,6 +106,18 @@ var ColumnsView = class extends import_obsidian.BasesView {
         type: "toggle",
         displayName: "Wrap multi-line values",
         default: false
+      },
+      {
+        key: CFG_DATE_FORMAT,
+        type: "dropdown",
+        displayName: "Date format",
+        default: "auto",
+        options: {
+          auto: "Automatic",
+          relative: "Relative (3 days ago)",
+          date: "Date only",
+          datetime: "Date and time"
+        }
       }
     ];
   }
@@ -135,7 +148,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const parsed = (0, import_obsidian.parsePropertyId)(raw);
       return parsed?.name ?? raw;
     }
-    return null;
+    if (cfg?.groupBy !== void 0) return null;
+    return "tags";
   }
   getTitleProperty() {
     const fromProp = this.propKey(CFG_TITLE_PROP);
@@ -374,6 +388,27 @@ var ColumnsView = class extends import_obsidian.BasesView {
       (0, import_obsidian.setIcon)(iconEl, val.toString() === "true" ? "square-check-big" : "square");
       return;
     }
+    if (val instanceof import_obsidian.DateValue) {
+      const fmt = this.cfg(CFG_DATE_FORMAT, "auto");
+      let text2;
+      switch (fmt) {
+        case "relative":
+          text2 = val.relative();
+          break;
+        case "date":
+          text2 = val.dateOnly().toString();
+          break;
+        case "datetime":
+          text2 = val.toString();
+          break;
+        default:
+          text2 = val.relative();
+          break;
+      }
+      const textEl = chip.createSpan({ cls: "columns-chip-text" });
+      textEl.textContent = text2;
+      return;
+    }
     if (val instanceof import_obsidian.LinkValue) {
       const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
       const raw = val.toString();
@@ -416,7 +451,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const text = val.toString();
     const urlMatch = text.match(/^(https?:\/\/[^\s]+)$/);
     if (urlMatch) {
-      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1], target: "_blank" });
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1] });
+      linkEl.target = "_blank";
       linkEl.textContent = text;
       linkEl.addEventListener("click", (e) => e.stopPropagation());
     } else {

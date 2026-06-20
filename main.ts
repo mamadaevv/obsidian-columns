@@ -6,6 +6,7 @@ import {
   Value,
   NullValue,
   BooleanValue,
+  DateValue,
   LinkValue,
   ListValue,
   QueryController,
@@ -28,6 +29,7 @@ const CFG_COL_WIDTH = "columnWidth";
 const CFG_OPEN_BEHAVIOR = "openBehavior";
 const CFG_WRAP_TITLE = "wrapTitle";
 const CFG_WRAP_VALUES = "wrapValues";
+const CFG_DATE_FORMAT = "dateFormat";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -131,6 +133,18 @@ class ColumnsView extends BasesView {
         displayName: "Wrap multi-line values",
         default: false,
       },
+      {
+        key: CFG_DATE_FORMAT,
+        type: "dropdown",
+        displayName: "Date format",
+        default: "auto",
+        options: {
+          auto: "Automatic",
+          relative: "Relative (3 days ago)",
+          date: "Date only",
+          datetime: "Date and time",
+        },
+      },
     ];
   }
 
@@ -158,14 +172,16 @@ class ColumnsView extends BasesView {
   }
 
   private getColumnProperty(): string | null {
-    // Read from the built-in groupBy config (set via toolbar Group by button)
     const cfg = this.config as any;
     const raw: string | undefined = cfg?.groupBy?.property;
     if (raw) {
       const parsed = parsePropertyId(raw as any);
       return parsed?.name ?? raw;
     }
-    return null;
+    // If groupBy is explicitly configured but empty (no property selected), show no grouping
+    if (cfg?.groupBy !== undefined) return null;
+    // Default: file.tags
+    return "tags";
   }
 
   private getTitleProperty(): string | null {
@@ -474,6 +490,19 @@ class ColumnsView extends BasesView {
       setIcon(iconEl, val.toString() === "true" ? "square-check-big" : "square");
       return;
     }
+    if (val instanceof DateValue) {
+      const fmt: string = this.cfg(CFG_DATE_FORMAT, "auto");
+      let text: string;
+      switch (fmt) {
+        case "relative": text = val.relative(); break;
+        case "date": text = val.dateOnly().toString(); break;
+        case "datetime": text = val.toString(); break;
+        default: text = val.relative(); break;
+      }
+      const textEl = chip.createSpan({ cls: "columns-chip-text" });
+      textEl.textContent = text;
+      return;
+    }
     if (val instanceof LinkValue) {
       const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
       const raw = val.toString();
@@ -522,7 +551,8 @@ class ColumnsView extends BasesView {
     const text = val.toString();
     const urlMatch = text.match(/^(https?:\/\/[^\s]+)$/);
     if (urlMatch) {
-      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1], target: "_blank" });
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1] });
+      linkEl.target = "_blank";
       linkEl.textContent = text;
       linkEl.addEventListener("click", (e) => e.stopPropagation());
     } else {
