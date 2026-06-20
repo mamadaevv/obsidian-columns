@@ -36,6 +36,7 @@ var CFG_CHIP_GRID = "chipGrid";
 var CFG_CHIP_FONT_SIZE = "chipFontSize";
 var CFG_TITLE_FONT_SIZE = "titleFontSize";
 var CFG_WRAP_VALUES = "wrapValues";
+var CFG_FILTER_HEIGHT = "filterHeight";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -343,6 +344,27 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const tags = Array.from(columnMap.keys()).sort();
     if (tags.length === 0 && this.activeFilters.size === 0) return;
     const barEl = this.containerEl.createDiv({ cls: "columns-filter-bar" });
+    const savedH = this.cfg(CFG_FILTER_HEIGHT, 120);
+    barEl.style.maxHeight = savedH + "px";
+    barEl.style.cursor = "row-resize";
+    let startY = 0, startH = 0;
+    const onMove = (e) => {
+      const h = Math.max(60, startH + (e.clientY - startY));
+      barEl.style.maxHeight = h + "px";
+      barEl.style.cursor = "row-resize";
+    };
+    const onUp = (e) => {
+      document.removeEventListener("mousemove", onMove);
+      const h = Math.max(60, startH + (e.clientY - startY));
+      this.config?.set(CFG_FILTER_HEIGHT, h);
+    };
+    barEl.addEventListener("mousedown", (e) => {
+      if (e.offsetY < barEl.clientHeight - 8) return;
+      startY = e.clientY;
+      startH = barEl.clientHeight;
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp, { once: true });
+    });
     const modeBtn = barEl.createSpan({ cls: "columns-mode-btn" });
     modeBtn.textContent = this.andMode ? "AND" : "OR";
     modeBtn.addEventListener("click", () => {

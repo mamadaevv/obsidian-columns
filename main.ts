@@ -37,6 +37,7 @@ const CFG_CHIP_GRID = "chipGrid";
 const CFG_CHIP_FONT_SIZE = "chipFontSize";
 const CFG_TITLE_FONT_SIZE = "titleFontSize";
 const CFG_WRAP_VALUES = "wrapValues";
+const CFG_FILTER_HEIGHT = "filterHeight";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -408,6 +409,30 @@ class ColumnsView extends BasesView {
     if (tags.length === 0 && this.activeFilters.size === 0) return;
 
     const barEl = this.containerEl.createDiv({ cls: "columns-filter-bar" });
+    const savedH = this.cfg(CFG_FILTER_HEIGHT, 120);
+    barEl.style.maxHeight = savedH + "px";
+
+    // Resize: invisible draggable zone at bottom
+    barEl.style.cursor = "row-resize";
+    let startY = 0, startH = 0;
+    const onMove = (e: MouseEvent) => {
+      const h = Math.max(60, startH + (e.clientY - startY));
+      barEl.style.maxHeight = h + "px";
+      barEl.style.cursor = "row-resize";
+    };
+    const onUp = (e: MouseEvent) => {
+      document.removeEventListener("mousemove", onMove);
+      const h = Math.max(60, startH + (e.clientY - startY));
+      this.config?.set(CFG_FILTER_HEIGHT, h);
+    };
+    barEl.addEventListener("mousedown", (e) => {
+      // Only resize when near the bottom edge (last 8px)
+      if (e.offsetY < barEl.clientHeight - 8) return;
+      startY = e.clientY;
+      startH = barEl.clientHeight;
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp, { once: true });
+    });
 
     const modeBtn = barEl.createSpan({ cls: "columns-mode-btn" });
     modeBtn.textContent = this.andMode ? "AND" : "OR";
