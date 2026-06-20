@@ -379,11 +379,11 @@ var ColumnsView = class extends import_obsidian.BasesView {
     titleEl.textContent = title;
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
-    if (chipGrid) cardEl.addClass("has-chip-grid");
+    const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof import_obsidian.NullValue) continue;
-      const chip = cardEl.createDiv({ cls: "columns-card-chip" });
+      const chip = chipsEl.createDiv({ cls: "columns-card-chip" });
       if (wrapValues) chip.addClass("is-wrap");
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
