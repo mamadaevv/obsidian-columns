@@ -102,85 +102,103 @@ class ColumnsView extends BasesView {
   static getViewOptions(): BasesAllOptions[] {
     return [
       {
-        key: CFG_OPEN_BEHAVIOR,
-        type: "dropdown",
-        displayName: "Open card in",
-        default: "tab",
-        options: {
-          active: "Active pane",
-          modal: "Floating modal",
-          tab: "New tab",
-        },
+        type: "group",
+        displayName: "General",
+        items: [
+          {
+            key: CFG_OPEN_BEHAVIOR,
+            type: "dropdown",
+            displayName: "Open card in",
+            default: "tab",
+            options: {
+              active: "Active pane",
+              modal: "Floating modal",
+              tab: "New tab",
+            },
+          },
+          {
+            key: CFG_DATE_FORMAT_D,
+            type: "text",
+            displayName: "Date format",
+            placeholder: "Relative — e.g. DD-MM-YYYY",
+          },
+          {
+            key: CFG_DATE_FORMAT_DT,
+            type: "text",
+            displayName: "Date & time format",
+            placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
+          },
+          {
+            key: CFG_DATE_LOCALE,
+            type: "text",
+            displayName: "Locale",
+            placeholder: "en, ru, de, fr, es, ja, zh-cn...",
+          },
+          {
+            key: CFG_COL_WIDTH,
+            type: "slider",
+            displayName: "Column width (px)",
+            default: 300,
+            min: 150,
+            max: 500,
+            step: 10,
+          },
+        ],
       },
       {
-        displayName: "Card title property",
-        type: "property",
-        key: CFG_TITLE_PROP,
-        placeholder: "File name",
+        type: "group",
+        displayName: "Title",
+        items: [
+          {
+            displayName: "Card title property",
+            type: "property",
+            key: CFG_TITLE_PROP,
+            placeholder: "File name",
+          },
+          {
+            key: CFG_WRAP_TITLE,
+            type: "toggle",
+            displayName: "Wrap card titles",
+            default: false,
+          },
+          {
+            key: CFG_BOLD_TITLE,
+            type: "toggle",
+            displayName: "Bold card titles",
+            default: true,
+          },
+        ],
       },
       {
-        key: CFG_WRAP_TITLE,
-        type: "toggle",
-        displayName: "Wrap card titles",
-        default: false,
-      },
-      {
-        key: CFG_BOLD_TITLE,
-        type: "toggle",
-        displayName: "Bold card titles",
-        default: true,
-      },
-      {
-        key: CFG_WRAP_VALUES,
-        type: "toggle",
-        displayName: "Wrap multi-line values",
-        default: false,
-      },
-      {
-        key: CFG_CHIP_GRID,
-        type: "dropdown",
-        displayName: "Chip layout",
-        default: "stack",
-        options: {
-          stack: "Stack",
-          grid: "Grid",
-        },
-      },
-      {
-        key: CFG_CHIP_FONT_SIZE,
-        type: "slider",
-        displayName: "Chip font size (px)",
-        default: 12,
-        min: 9,
-        max: 12,
-        step: 1,
-      },
-      {
-        key: CFG_DATE_FORMAT_D,
-        type: "text",
-        displayName: "Date format",
-        placeholder: "Relative — e.g. DD-MM-YYYY",
-      },
-      {
-        key: CFG_DATE_FORMAT_DT,
-        type: "text",
-        displayName: "Date & time format",
-        placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
-      },
-      {
-        key: CFG_DATE_LOCALE,
-        type: "text",
-        displayName: "Locale",
-        placeholder: "en, ru, de, fr, es, ja, zh-cn...",
-      },
-      {
-        key: CFG_COL_WIDTH,
-        type: "slider",
-        displayName: "Column width (px)",
-        default: 300,
-        min: 150,
-        max: 500,
-        step: 10,
+        type: "group",
+        displayName: "Chips",
+        items: [
+          {
+            key: CFG_CHIP_GRID,
+            type: "dropdown",
+            displayName: "Chip layout",
+            default: "stack",
+            options: {
+              stack: "Stack",
+              grid: "Grid",
+            },
+          },
+          {
+            key: CFG_WRAP_VALUES,
+            type: "toggle",
+            displayName: "Wrap multi-line values",
+            default: false,
+          },
+          {
+            key: CFG_CHIP_FONT_SIZE,
+            type: "slider",
+            displayName: "Chip font size (px)",
+            default: 12,
+            min: 9,
+            max: 12,
+            step: 1,
+          },
+        ],
       },
     ];
   }
@@ -488,10 +506,11 @@ class ColumnsView extends BasesView {
     titleEl.textContent = title;
 
     // Visible property chips
-    const chipGrid = this.cfg(CFG_CHIP_GRID, "stack") === "grid";
+    const chipGrid: string = this.cfg(CFG_CHIP_GRID, "stack");
+    const isGrid = chipGrid === "grid";
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
-    const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
+    const chipsEl = cardEl.createDiv({ cls: isGrid ? "columns-chips-grid" : "columns-chips" });
     chipsEl.style.setProperty("--chip-fs", chipFontSize + "px");
     if (!wrapValues) chipsEl.addClass("is-clip");
     for (const propId of visibleProps) {
