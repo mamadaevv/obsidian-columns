@@ -413,8 +413,15 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
       return;
     }
-    const textEl = chip.createSpan({ cls: "columns-chip-text" });
-    textEl.textContent = val.toString();
+    const text = val.toString();
+    const urlMatch = text.match(/^(https?:\/\/[^\s]+)$/);
+    if (urlMatch) {
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1], target: "_blank" });
+      linkEl.textContent = text;
+    } else {
+      const textEl = chip.createSpan({ cls: "columns-chip-text" });
+      textEl.textContent = text;
+    }
   }
   // -----------------------------------------------------------------------
   //  Open file

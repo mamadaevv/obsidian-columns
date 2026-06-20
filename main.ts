@@ -518,9 +518,16 @@ class ColumnsView extends BasesView {
       }
       return;
     }
-    // Default: plain text
-    const textEl = chip.createSpan({ cls: "columns-chip-text" });
-    textEl.textContent = val.toString();
+    // Default: plain text (detect URLs)
+    const text = val.toString();
+    const urlMatch = text.match(/^(https?:\/\/[^\s]+)$/);
+    if (urlMatch) {
+      const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1], target: "_blank" });
+      linkEl.textContent = text;
+    } else {
+      const textEl = chip.createSpan({ cls: "columns-chip-text" });
+      textEl.textContent = text;
+    }
   }
 
   // -----------------------------------------------------------------------
