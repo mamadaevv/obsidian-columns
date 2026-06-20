@@ -94,6 +94,7 @@
   border-right: 1px solid var(--background-modifier-border);
   height: 100%;
   min-height: 0;
+  padding: 0 12px;
 }
 
 .columns-column-header {
