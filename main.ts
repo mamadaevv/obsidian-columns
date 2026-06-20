@@ -521,7 +521,7 @@ class ColumnsView extends BasesView {
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
     chipsEl.style.setProperty("--chip-fs", chipFontSize + "px");
-    if (wrapValues) chipsEl.addClass("is-wrap");
+    if (!wrapValues) chipsEl.addClass("is-clip");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;

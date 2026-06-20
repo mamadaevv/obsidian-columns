@@ -211,12 +211,30 @@
   font-size: var(--chip-fs);
 }
 
+.columns-chips.is-clip .columns-chip-text,
+.columns-chips.is-clip .columns-chip-boolean,
+.columns-chips.is-clip .columns-chip-link,
+.columns-chips.is-clip .columns-chip-tag {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .columns-chips-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   min-width: 0;
   font-size: var(--chip-fs);
+}
+
+.columns-chips-grid.is-clip .columns-chip-text,
+.columns-chips-grid.is-clip .columns-chip-boolean,
+.columns-chips-grid.is-clip .columns-chip-link,
+.columns-chips-grid.is-clip .columns-chip-tag {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .columns-chips-grid .columns-card-chip {
