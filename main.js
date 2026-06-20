@@ -28,7 +28,6 @@ var CFG_TITLE_PROP = "titleProperty";
 var CFG_COL_WIDTH = "columnWidth";
 var CFG_OPEN_BEHAVIOR = "openBehavior";
 var CFG_WRAP_TITLE = "wrapTitle";
-var CFG_WRAP_VALUES = "wrapValues";
 var CFG_DATE_FORMAT_D = "dateFormatDate";
 var CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 var CFG_DATE_LOCALE = "dateLocale";
@@ -101,12 +100,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
         key: CFG_WRAP_TITLE,
         type: "toggle",
         displayName: "Wrap card titles",
-        default: false
-      },
-      {
-        key: CFG_WRAP_VALUES,
-        type: "toggle",
-        displayName: "Wrap multi-line values",
         default: false
       },
       {
@@ -387,7 +380,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (!this.cfg(CFG_BOLD_TITLE, true)) titleEl.addClass("is-normal-weight");
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
-    const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
@@ -396,7 +388,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const val = entry.getValue(propId);
       if (val == null || val instanceof import_obsidian.NullValue) continue;
       const chip = chipsEl.createDiv({ cls: "columns-card-chip" });
-      if (wrapValues) chip.addClass("is-wrap");
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });

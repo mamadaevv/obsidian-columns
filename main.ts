@@ -29,8 +29,6 @@ const CFG_TITLE_PROP = "titleProperty";
 const CFG_COL_WIDTH = "columnWidth";
 const CFG_OPEN_BEHAVIOR = "openBehavior";
 const CFG_WRAP_TITLE = "wrapTitle";
-const CFG_WRAP_VALUES = "wrapValues";
-const CFG_DATE_FORMAT = "dateFormat";
 const CFG_DATE_FORMAT_D = "dateFormatDate";
 const CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 const CFG_DATE_LOCALE = "dateLocale";
@@ -129,12 +127,6 @@ class ColumnsView extends BasesView {
         key: CFG_WRAP_TITLE,
         type: "toggle",
         displayName: "Wrap card titles",
-        default: false,
-      },
-      {
-        key: CFG_WRAP_VALUES,
-        type: "toggle",
-        displayName: "Wrap multi-line values",
         default: false,
       },
       {
@@ -485,7 +477,6 @@ class ColumnsView extends BasesView {
     titleEl.textContent = title;
 
     // Visible property chips
-    const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
@@ -494,7 +485,6 @@ class ColumnsView extends BasesView {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;
       const chip = chipsEl.createDiv({ cls: "columns-card-chip" });
-      if (wrapValues) chip.addClass("is-wrap");
       const parsed = parsePropertyId(propId);
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
