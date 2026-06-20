@@ -203,6 +203,11 @@
   font-size: var(--chip-fs);
 }
 
+.columns-chips.is-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .columns-chips-grid {
   display: flex;
   flex-wrap: wrap;

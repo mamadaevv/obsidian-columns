@@ -34,6 +34,7 @@ var CFG_DATE_LOCALE = "dateLocale";
 var CFG_BOLD_TITLE = "boldTitle";
 var CFG_CHIP_GRID = "chipGrid";
 var CFG_CHIP_FONT_SIZE = "chipFontSize";
+var CFG_WRAP_VALUES = "wrapValues";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -100,6 +101,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
         key: CFG_WRAP_TITLE,
         type: "toggle",
         displayName: "Wrap card titles",
+        default: false
+      },
+      {
+        key: CFG_WRAP_VALUES,
+        type: "toggle",
+        displayName: "Wrap multi-line values",
         default: false
       },
       {
@@ -382,8 +389,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
     titleEl.textContent = title;
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
+    const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
     chipsEl.style.setProperty("--chip-fs", chipFontSize + "px");
+    if (wrapValues) chipsEl.addClass("is-wrap");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof import_obsidian.NullValue) continue;

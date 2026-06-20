@@ -35,6 +35,7 @@ const CFG_DATE_LOCALE = "dateLocale";
 const CFG_BOLD_TITLE = "boldTitle";
 const CFG_CHIP_GRID = "chipGrid";
 const CFG_CHIP_FONT_SIZE = "chipFontSize";
+const CFG_WRAP_VALUES = "wrapValues";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -127,6 +128,12 @@ class ColumnsView extends BasesView {
         key: CFG_WRAP_TITLE,
         type: "toggle",
         displayName: "Wrap card titles",
+        default: false,
+      },
+      {
+        key: CFG_WRAP_VALUES,
+        type: "toggle",
+        displayName: "Wrap multi-line values",
         default: false,
       },
       {
@@ -479,8 +486,10 @@ class ColumnsView extends BasesView {
     // Visible property chips
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
+    const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
     chipsEl.style.setProperty("--chip-fs", chipFontSize + "px");
+    if (wrapValues) chipsEl.addClass("is-wrap");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;
