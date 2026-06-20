@@ -251,6 +251,7 @@
 
 .columns-chip-text,
 .columns-chip-boolean {
+  font-size: var(--chip-fs);
   color: var(--text-normal);
   line-height: 1.4;
 }
@@ -261,6 +262,7 @@
 }
 
 .columns-chip-link {
+  font-size: var(--chip-fs);
   color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;

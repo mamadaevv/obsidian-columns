@@ -149,7 +149,7 @@ class ColumnsView extends BasesView {
         displayName: "Chip font size (px)",
         default: 12,
         min: 9,
-        max: 16,
+        max: 12,
         step: 1,
       },
       {
