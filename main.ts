@@ -35,6 +35,7 @@ const CFG_DATE_LOCALE = "dateLocale";
 const CFG_BOLD_TITLE = "boldTitle";
 const CFG_CHIP_GRID = "chipGrid";
 const CFG_CHIP_FONT_SIZE = "chipFontSize";
+const CFG_TITLE_FONT_SIZE = "titleFontSize";
 const CFG_WRAP_VALUES = "wrapValues";
 
 // ---------------------------------------------------------------------------
@@ -117,24 +118,6 @@ class ColumnsView extends BasesView {
             },
           },
           {
-            key: CFG_DATE_FORMAT_D,
-            type: "text",
-            displayName: "Date format",
-            placeholder: "Relative — e.g. DD-MM-YYYY",
-          },
-          {
-            key: CFG_DATE_FORMAT_DT,
-            type: "text",
-            displayName: "Date & time format",
-            placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
-          },
-          {
-            key: CFG_DATE_LOCALE,
-            type: "text",
-            displayName: "Locale",
-            placeholder: "en, ru, de, fr, es, ja, zh-cn...",
-          },
-          {
             key: CFG_COL_WIDTH,
             type: "slider",
             displayName: "Column width (px)",
@@ -167,6 +150,15 @@ class ColumnsView extends BasesView {
             displayName: "Bold card titles",
             default: true,
           },
+          {
+            key: CFG_TITLE_FONT_SIZE,
+            type: "slider",
+            displayName: "Title font size (px)",
+            default: 14,
+            min: 11,
+            max: 20,
+            step: 1,
+          },
         ],
       },
       {
@@ -197,6 +189,24 @@ class ColumnsView extends BasesView {
             min: 9,
             max: 12,
             step: 1,
+          },
+          {
+            key: CFG_DATE_FORMAT_D,
+            type: "text",
+            displayName: "Date format",
+            placeholder: "Relative — e.g. DD-MM-YYYY",
+          },
+          {
+            key: CFG_DATE_FORMAT_DT,
+            type: "text",
+            displayName: "Date & time format",
+            placeholder: "Relative — e.g. DD-MM-YYYY HH:mm",
+          },
+          {
+            key: CFG_DATE_LOCALE,
+            type: "text",
+            displayName: "Locale",
+            placeholder: "en, ru, de, fr, es, ja, zh-cn...",
           },
         ],
       },
@@ -503,6 +513,7 @@ class ColumnsView extends BasesView {
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     if (!this.cfg(CFG_BOLD_TITLE, true)) titleEl.addClass("is-normal-weight");
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
+    titleEl.style.setProperty("--title-fs", this.cfg(CFG_TITLE_FONT_SIZE, 14) + "px");
     titleEl.textContent = title;
 
     // Visible property chips

@@ -34,6 +34,7 @@ var CFG_DATE_LOCALE = "dateLocale";
 var CFG_BOLD_TITLE = "boldTitle";
 var CFG_CHIP_GRID = "chipGrid";
 var CFG_CHIP_FONT_SIZE = "chipFontSize";
+var CFG_TITLE_FONT_SIZE = "titleFontSize";
 var CFG_WRAP_VALUES = "wrapValues";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
@@ -90,24 +91,6 @@ var ColumnsView = class extends import_obsidian.BasesView {
             }
           },
           {
-            key: CFG_DATE_FORMAT_D,
-            type: "text",
-            displayName: "Date format",
-            placeholder: "Relative \u2014 e.g. DD-MM-YYYY"
-          },
-          {
-            key: CFG_DATE_FORMAT_DT,
-            type: "text",
-            displayName: "Date & time format",
-            placeholder: "Relative \u2014 e.g. DD-MM-YYYY HH:mm"
-          },
-          {
-            key: CFG_DATE_LOCALE,
-            type: "text",
-            displayName: "Locale",
-            placeholder: "en, ru, de, fr, es, ja, zh-cn..."
-          },
-          {
             key: CFG_COL_WIDTH,
             type: "slider",
             displayName: "Column width (px)",
@@ -139,6 +122,15 @@ var ColumnsView = class extends import_obsidian.BasesView {
             type: "toggle",
             displayName: "Bold card titles",
             default: true
+          },
+          {
+            key: CFG_TITLE_FONT_SIZE,
+            type: "slider",
+            displayName: "Title font size (px)",
+            default: 14,
+            min: 11,
+            max: 20,
+            step: 1
           }
         ]
       },
@@ -170,6 +162,24 @@ var ColumnsView = class extends import_obsidian.BasesView {
             min: 9,
             max: 12,
             step: 1
+          },
+          {
+            key: CFG_DATE_FORMAT_D,
+            type: "text",
+            displayName: "Date format",
+            placeholder: "Relative \u2014 e.g. DD-MM-YYYY"
+          },
+          {
+            key: CFG_DATE_FORMAT_DT,
+            type: "text",
+            displayName: "Date & time format",
+            placeholder: "Relative \u2014 e.g. DD-MM-YYYY HH:mm"
+          },
+          {
+            key: CFG_DATE_LOCALE,
+            type: "text",
+            displayName: "Locale",
+            placeholder: "en, ru, de, fr, es, ja, zh-cn..."
           }
         ]
       }
@@ -408,6 +418,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const titleEl = cardEl.createDiv({ cls: "columns-card-title" });
     if (!this.cfg(CFG_BOLD_TITLE, true)) titleEl.addClass("is-normal-weight");
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
+    titleEl.style.setProperty("--title-fs", this.cfg(CFG_TITLE_FONT_SIZE, 14) + "px");
     titleEl.textContent = title;
     const chipGrid = this.cfg(CFG_CHIP_GRID, "stack");
     const isGrid = chipGrid === "grid";
