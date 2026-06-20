@@ -412,7 +412,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const hasTime = raw.includes(":") || raw.includes("T");
       const fmt = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
       const m = locale ? (0, import_obsidian.moment)(raw).locale(locale) : (0, import_obsidian.moment)(raw);
-      const text2 = fmt ? m.format(fmt) : locale ? m.fromNow() : val.relative();
+      const text2 = fmt ? m.format(fmt) : m.isValid() ? m.fromNow() : val.relative();
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text2;
       return;

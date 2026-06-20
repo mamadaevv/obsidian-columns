@@ -516,7 +516,11 @@ class ColumnsView extends BasesView {
       const hasTime = raw.includes(":") || raw.includes("T");
       const fmt: string = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
       const m = locale ? moment(raw).locale(locale) : moment(raw);
-      const text = fmt ? m.format(fmt) : locale ? m.fromNow() : val.relative();
+      const text = fmt
+        ? m.format(fmt)
+        : m.isValid()
+          ? m.fromNow()
+          : val.relative();
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text;
       return;
