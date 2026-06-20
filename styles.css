@@ -193,6 +193,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  overflow: hidden;
 }
 
 /* Grid layout: chips flow inline */
@@ -203,7 +204,8 @@
   font-size: var(--chip-fs);
 }
 
-.columns-chips.is-wrap {
+.columns-chips.is-wrap,
+.columns-chips-grid.is-wrap {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -213,8 +215,6 @@
   flex-wrap: wrap;
   gap: 6px 12px;
   min-width: 0;
-  word-break: break-word;
-  overflow-wrap: anywhere;
   font-size: var(--chip-fs);
 }
 
