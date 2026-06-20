@@ -420,7 +420,10 @@ class ColumnsView extends BasesView {
       const chip = cardEl.createSpan({ cls: "columns-card-chip" });
       const parsed = parsePropertyId(propId);
       const label = parsed?.name ?? propId;
-      chip.textContent = `${label}: ${val.toString()}`;
+      const labelEl = chip.createSpan({ cls: "columns-card-chip-label" });
+      labelEl.textContent = label;
+      const valEl = chip.createSpan({ cls: "columns-card-chip-value" });
+      valEl.textContent = val.toString();
     }
 
     cardEl.addEventListener("click", (e) => {

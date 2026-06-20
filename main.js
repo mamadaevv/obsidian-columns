@@ -331,7 +331,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const chip = cardEl.createSpan({ cls: "columns-card-chip" });
       const parsed = (0, import_obsidian.parsePropertyId)(propId);
       const label = parsed?.name ?? propId;
-      chip.textContent = `${label}: ${val.toString()}`;
+      const labelEl = chip.createSpan({ cls: "columns-card-chip-label" });
+      labelEl.textContent = label;
+      const valEl = chip.createSpan({ cls: "columns-card-chip-value" });
+      valEl.textContent = val.toString();
     }
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {

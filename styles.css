@@ -189,6 +189,15 @@
   white-space: nowrap;
 }
 
+.columns-card-chip-label {
+  color: var(--text-muted);
+}
+
+.columns-card-chip-value {
+  color: var(--text-normal);
+  margin-left: 3px;
+}
+
 /* ---------------------------------------------------------------------------
   Empty state
   --------------------------------------------------------------------------- */
