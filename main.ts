@@ -18,6 +18,7 @@ import {
   App,
   setIcon,
   parsePropertyId,
+  moment,
 } from "obsidian";
 
 // ---------------------------------------------------------------------------
@@ -503,25 +504,12 @@ class ColumnsView extends BasesView {
     if (val instanceof DateValue) {
       const fmtD: string = this.cfg(CFG_DATE_FORMAT_D, "");
       const fmtDT: string = this.cfg(CFG_DATE_FORMAT_DT, "");
-      let text: string;
       const raw = val.toString();
       const hasTime = raw.includes(":") || raw.includes("T");
       const fmt: string = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
-      if (!fmt) {
-        text = val.relative();
-      } else {
-        // Basic format support: DD, MM, YYYY, HH, mm
-        const d = new Date(raw);
-        const pad = (n: number) => String(n).padStart(2, "0");
-        text = fmt
-          .replace("YYYY", String(d.getFullYear()))
-          .replace("YY", String(d.getFullYear()).slice(-2))
-          .replace("MM", pad(d.getMonth() + 1))
-          .replace("DD", pad(d.getDate()))
-          .replace("HH", pad(d.getHours()))
-          .replace("mm", pad(d.getMinutes()))
-          .replace("ss", pad(d.getSeconds()));
-      }
+      const text = fmt
+        ? moment(raw).format(fmt)
+        : val.relative();
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text;
       return;

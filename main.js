@@ -400,17 +400,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (val instanceof import_obsidian.DateValue) {
       const fmtD = this.cfg(CFG_DATE_FORMAT_D, "");
       const fmtDT = this.cfg(CFG_DATE_FORMAT_DT, "");
-      let text2;
       const raw = val.toString();
       const hasTime = raw.includes(":") || raw.includes("T");
       const fmt = hasTime && fmtDT ? fmtDT : !hasTime && fmtD ? fmtD : "";
-      if (!fmt) {
-        text2 = val.relative();
-      } else {
-        const d = new Date(raw);
-        const pad = (n) => String(n).padStart(2, "0");
-        text2 = fmt.replace("YYYY", String(d.getFullYear())).replace("YY", String(d.getFullYear()).slice(-2)).replace("MM", pad(d.getMonth() + 1)).replace("DD", pad(d.getDate())).replace("HH", pad(d.getHours())).replace("mm", pad(d.getMinutes())).replace("ss", pad(d.getSeconds()));
-      }
+      const text2 = fmt ? (0, import_obsidian.moment)(raw).format(fmt) : val.relative();
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text2;
       return;
