@@ -524,6 +524,7 @@ class ColumnsView extends BasesView {
     if (urlMatch) {
       const linkEl = chip.createEl("a", { cls: "columns-chip-link", href: urlMatch[1], target: "_blank" });
       linkEl.textContent = text;
+      linkEl.addEventListener("click", (e) => e.stopPropagation());
     } else {
       const textEl = chip.createSpan({ cls: "columns-chip-text" });
       textEl.textContent = text;
