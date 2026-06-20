@@ -235,14 +235,8 @@
   gap: 2px;
   margin-top: 0;
   min-width: 0;
-}
-
-.columns-chips-grid .columns-card-chip .columns-chip-text,
-.columns-chips-grid .columns-card-chip .columns-chip-boolean,
-.columns-chips-grid .columns-card-chip .columns-chip-link,
-.columns-chips-grid .columns-card-chip .columns-chip-tag-row {
-  width: clamp(80px, fit-content, 100%);
   max-width: 100%;
+  width: fit-content;
 }
 
 .columns-card-chip-label {
