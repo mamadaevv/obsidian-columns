@@ -163,8 +163,6 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  word-break: break-word;
-  overflow-wrap: anywhere;
   min-width: 0;
 }
 
@@ -211,29 +209,6 @@
   flex-direction: column;
   gap: 16px;
   font-size: var(--chip-fs);
-}
-
-.columns-chips.is-wrap,
-.columns-chips-grid.is-wrap {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.columns-chips.is-wrap .columns-chip-text,
-.columns-chips.is-wrap .columns-chip-boolean,
-.columns-chips.is-wrap .columns-chip-link,
-.columns-chips.is-wrap .columns-chip-tag {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.columns-chips-grid.is-wrap .columns-chip-text,
-.columns-chips-grid.is-wrap .columns-chip-boolean,
-.columns-chips-grid.is-wrap .columns-chip-link,
-.columns-chips-grid.is-wrap .columns-chip-tag {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  width: 100%;
 }
 
 .columns-chips-grid {
