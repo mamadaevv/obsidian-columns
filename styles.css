@@ -2,10 +2,6 @@
   Columns view — main container
   --------------------------------------------------------------------------- */
 
-.view-content:has(.columns-container) {
-  padding: 0 !important;
-}
-
 .columns-container {
   display: flex;
   flex-direction: column;
