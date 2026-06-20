@@ -75,6 +75,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   align-items: stretch;
+  background: var(--background-secondary);
 }
 
 /* ---------------------------------------------------------------------------
