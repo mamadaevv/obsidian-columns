@@ -284,14 +284,11 @@ class ColumnsView extends BasesView {
   /** Get visible properties from the Properties button. */
   private getVisiblePropertyIds(): string[] {
     const props = this.config?.getOrder() ?? [];
-    const columnProp = this.getColumnProperty();
     const titlePropName = this.getTitleProperty();
     const titlePropId = this.getTitlePropertyId();
     return props.filter((id) => {
       const parsed = parsePropertyId(id);
       if (!parsed) return false;
-      // Skip column property — already shown as column headers
-      if (parsed.name === columnProp) return false;
       // Skip if this property is used as the card title
       if (titlePropName && parsed.name === titlePropName) return false;
       if (titlePropId && id === titlePropId) return false;

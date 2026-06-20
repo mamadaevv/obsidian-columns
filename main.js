@@ -245,13 +245,11 @@ var ColumnsView = class extends import_obsidian.BasesView {
   /** Get visible properties from the Properties button. */
   getVisiblePropertyIds() {
     const props = this.config?.getOrder() ?? [];
-    const columnProp = this.getColumnProperty();
     const titlePropName = this.getTitleProperty();
     const titlePropId = this.getTitlePropertyId();
     return props.filter((id) => {
       const parsed = (0, import_obsidian.parsePropertyId)(id);
       if (!parsed) return false;
-      if (parsed.name === columnProp) return false;
       if (titlePropName && parsed.name === titlePropName) return false;
       if (titlePropId && id === titlePropId) return false;
       return true;
