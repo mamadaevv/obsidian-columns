@@ -96,7 +96,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
             displayName: "Column width (px)",
             default: 300,
             min: 150,
-            max: 500,
+            max: 700,
             step: 10
           }
         ]
