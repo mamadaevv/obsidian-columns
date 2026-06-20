@@ -121,9 +121,27 @@ var ColumnsView = class extends import_obsidian.BasesView {
       },
       {
         key: CFG_DATE_LOCALE,
-        type: "text",
+        type: "dropdown",
         displayName: "Locale",
-        placeholder: "en (default)"
+        default: "",
+        options: {
+          "": "English (default)",
+          ru: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
+          de: "Deutsch",
+          fr: "Fran\xE7ais",
+          es: "Espa\xF1ol",
+          it: "Italiano",
+          pt: "Portugu\xEAs",
+          nl: "Nederlands",
+          pl: "Polski",
+          ja: "\u65E5\u672C\u8A9E",
+          ko: "\uD55C\uAD6D\uC5B4",
+          "zh-cn": "\u4E2D\u6587 (\u7B80\u4F53)",
+          "zh-tw": "\u4E2D\u6587 (\u7E41\u9AD4)",
+          ar: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629",
+          tr: "T\xFCrk\xE7e",
+          uk: "\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430"
+        }
       },
       {
         key: CFG_COL_WIDTH,
