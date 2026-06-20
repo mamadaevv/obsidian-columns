@@ -33,6 +33,7 @@ var CFG_DATE_FORMAT_D = "dateFormatDate";
 var CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 var CFG_DATE_LOCALE = "dateLocale";
 var CFG_BOLD_TITLE = "boldTitle";
+var CFG_CHIP_GRID = "chipGrid";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -105,6 +106,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
         key: CFG_WRAP_VALUES,
         type: "toggle",
         displayName: "Wrap multi-line values",
+        default: false
+      },
+      {
+        key: CFG_CHIP_GRID,
+        type: "toggle",
+        displayName: "Chip grid layout",
         default: false
       },
       {
@@ -371,6 +378,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     if (this.cfg(CFG_WRAP_TITLE, false)) titleEl.addClass("is-wrap");
     titleEl.textContent = title;
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
+    const chipGrid = this.cfg(CFG_CHIP_GRID, false);
+    if (chipGrid) cardEl.addClass("has-chip-grid");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof import_obsidian.NullValue) continue;

@@ -35,6 +35,7 @@ const CFG_DATE_FORMAT_D = "dateFormatDate";
 const CFG_DATE_FORMAT_DT = "dateFormatDatetime";
 const CFG_DATE_LOCALE = "dateLocale";
 const CFG_BOLD_TITLE = "boldTitle";
+const CFG_CHIP_GRID = "chipGrid";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -133,6 +134,12 @@ class ColumnsView extends BasesView {
         key: CFG_WRAP_VALUES,
         type: "toggle",
         displayName: "Wrap multi-line values",
+        default: false,
+      },
+      {
+        key: CFG_CHIP_GRID,
+        type: "toggle",
+        displayName: "Chip grid layout",
         default: false,
       },
       {
@@ -469,6 +476,8 @@ class ColumnsView extends BasesView {
 
     // Visible property chips
     const wrapValues = this.cfg(CFG_WRAP_VALUES, false);
+    const chipGrid = this.cfg(CFG_CHIP_GRID, false);
+    if (chipGrid) cardEl.addClass("has-chip-grid");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;

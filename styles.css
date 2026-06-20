@@ -220,6 +220,41 @@
   margin-top: 16px;
 }
 
+/* Grid layout: chips flow inline, label on same line as value */
+.has-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.has-chip-grid .columns-card-chip {
+  flex: 0 0 auto;
+  margin-top: 0;
+  gap: 3px;
+}
+
+.has-chip-grid .columns-card-chip-label {
+  display: inline;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.has-chip-grid .columns-chip-text,
+.has-chip-grid .columns-chip-boolean,
+.has-chip-grid .columns-chip-link {
+  display: inline;
+  font-size: 11px;
+}
+
+.has-chip-grid .columns-chip-tag-row {
+  display: inline-flex;
+}
+
+.has-chip-grid .columns-chip-tag {
+  font-size: 10px;
+}
+
 .columns-card-chip-label {
   font-size: 10px;
   font-weight: 600;
