@@ -239,24 +239,7 @@
   margin-top: 0;
 }
 
-.columns-chips-grid .columns-card-chip-label {
-  display: inline;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.columns-chips-grid .columns-chip-text,
-.columns-chips-grid .columns-chip-boolean,
-.columns-chips-grid .columns-chip-link {
-  display: inline;
-}
-
-.columns-chips-grid .columns-chip-tag-row {
-  display: inline-flex;
-}
-
 .columns-card-chip-label {
-  font-size: 10px;
   font-weight: 600;
   color: var(--text-faint);
   text-transform: uppercase;
@@ -265,7 +248,6 @@
 
 .columns-chip-text,
 .columns-chip-boolean {
-  font-size: 13px;
   color: var(--text-normal);
   line-height: 1.4;
 }
@@ -276,7 +258,6 @@
 }
 
 .columns-chip-link {
-  font-size: 13px;
   color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;
