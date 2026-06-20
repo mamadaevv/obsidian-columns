@@ -489,7 +489,7 @@ class ColumnsView extends BasesView {
     const chipGrid = this.cfg(CFG_CHIP_GRID, false);
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
     const chipsEl = cardEl.createDiv({ cls: chipGrid ? "columns-chips-grid" : "columns-chips" });
-    chipsEl.style.fontSize = chipFontSize + "px";
+    chipsEl.style.setProperty("--chip-fs", chipFontSize + "px");
     for (const propId of visibleProps) {
       const val = entry.getValue(propId);
       if (val == null || val instanceof NullValue) continue;

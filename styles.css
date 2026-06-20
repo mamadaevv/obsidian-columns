@@ -222,6 +222,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  font-size: var(--chip-fs);
 }
 
 .columns-chips-grid {
@@ -231,6 +232,7 @@
   min-width: 0;
   word-break: break-word;
   overflow-wrap: anywhere;
+  font-size: var(--chip-fs);
 }
 
 .columns-chips-grid .columns-card-chip {
@@ -244,6 +246,7 @@
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  font-size: calc(var(--chip-fs) - 2px);
 }
 
 .columns-chip-text,
