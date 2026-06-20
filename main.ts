@@ -444,7 +444,7 @@ class ColumnsView extends BasesView {
       const label = parsed?.name ?? propId;
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label;
-      this.renderChipValue(chip, val);
+      this.renderChipValue(chip, val, file);
     }
 
     // Click events...
@@ -468,7 +468,7 @@ class ColumnsView extends BasesView {
   }
 
   /** Render a chip value based on its Obsidian Value type. */
-  private renderChipValue(chip: HTMLElement, val: Value): void {
+  private renderChipValue(chip: HTMLElement, val: Value, sourceFile: TFile): void {
     if (val instanceof BooleanValue) {
       const iconEl = chip.createSpan({ cls: "columns-chip-boolean" });
       setIcon(iconEl, val.toString() === "true" ? "square-check-big" : "square");
@@ -478,8 +478,17 @@ class ColumnsView extends BasesView {
       const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
       const raw = val.toString();
       const match = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);
-      if (match) linkEl.textContent = match[2] || match[1].split("/").pop()?.replace(/\.md$/, "") || raw;
-      else linkEl.textContent = raw;
+      const linkTarget = match ? match[1] : raw;
+      linkEl.textContent = match
+        ? match[2] || linkTarget.split("/").pop()?.replace(/\.md$/, "") || raw
+        : raw;
+      linkEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const resolved = this.app.metadataCache.getFirstLinkpathDest(linkTarget, sourceFile.path);
+        if (resolved && resolved instanceof TFile) {
+          this.openFile(resolved);
+        }
+      });
       return;
     }
     if (val instanceof ListValue) {
@@ -488,7 +497,23 @@ class ColumnsView extends BasesView {
         const item = val.get(i);
         if (!item || item instanceof NullValue || !item.isTruthy()) continue;
         const pill = chip.createSpan({ cls: "columns-chip-tag" });
-        pill.textContent = item.toString();
+        // Check if item is a link — render as clickable link tag
+        if (item instanceof LinkValue) {
+          const raw = item.toString();
+          const m = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);
+          const target = m ? m[1] : raw;
+          pill.textContent = m
+            ? m[2] || target.split("/").pop()?.replace(/\.md$/, "") || raw
+            : raw;
+          pill.style.cursor = "pointer";
+          pill.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const resolved = this.app.metadataCache.getFirstLinkpathDest(target, sourceFile.path);
+            if (resolved && resolved instanceof TFile) this.openFile(resolved);
+          });
+        } else {
+          pill.textContent = item.toString();
+        }
       }
       return;
     }
