@@ -585,16 +585,16 @@ var FilePreviewModal = class extends import_obsidian.Modal {
     contentEl.empty();
     contentEl.addClass("columns-modal-content");
     contentEl.createEl("h2", { text: this.file.basename });
-    const openBtn = contentEl.createEl("button", {
+    const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
+    const footer = contentEl.createDiv({ cls: "modal-footer" });
+    const openBtn = footer.createEl("button", {
       cls: "mod-cta",
-      text: "Open note"
+      text: "Open"
     });
-    openBtn.style.margin = "0 20px 8px";
     openBtn.addEventListener("click", () => {
       this.app.workspace.getLeaf(true).openFile(this.file);
       this.close();
     });
-    const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
     this.app.vault.read(this.file).then((text) => {
       import_obsidian.MarkdownRenderer.render(this.app, text, contentDiv, this.file.path, this);
     });
