@@ -431,8 +431,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
       if (val == null || val instanceof import_obsidian.NullValue) {
-        const dash = chip.createSpan({ cls: "columns-chip-text" });
-        dash.textContent = "\u2013";
+        if (parsed?.name === "backlinks" || parsed?.name === "embeds" || parsed?.name === "outlinks") {
+          const span = chip.createSpan({ cls: "columns-chip-text" });
+          span.textContent = "0";
+        } else {
+          const dash = chip.createSpan({ cls: "columns-chip-text" });
+          dash.textContent = "\u2013";
+        }
       } else {
         this.renderChipValue(chip, val, file, isTagProp);
       }
