@@ -68,22 +68,6 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 1. Download from Obsidian community plugins (pending)
 2. Or manual: copy `main.js`, `manifest.json`, `styles.css` to `obsidian-columns/` in your vault's `.obsidian/plugins/`
 
-## Development
-
-```bash
-npm install
-npm run build
-```
-
-## Publishing to Community Plugins
-
-To publish, you'll need:
-
-1. A **public GitHub repository** named `obsidian-columns`
-2. The repo must contain: `main.js`, `manifest.json`, `styles.css`, `LICENSE`, `README.md`
-3. A **git tag** matching the version in `manifest.json` (e.g. `0.2.0`)
-4. Create a PR to [obsidianmd/obsidian-releases](https://github.com/obsidianmd/obsidian-releases) adding an entry to `community-plugins.json`
-
 ## Support
 
 If you find this plugin useful, consider supporting its development:
