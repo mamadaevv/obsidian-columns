@@ -526,7 +526,7 @@ class ColumnsView extends BasesView {
       const label = this.config?.getDisplayName(propId) ?? parsed?.name ?? propId;
       const isTagProp = parsed?.name === "tags";
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
-      labelEl.textContent = label;
+      labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
       this.renderChipValue(chip, val, file, isTagProp);
     }
 
