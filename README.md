@@ -7,7 +7,7 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 <!-- Video 1: Overview -->
 **1. Overview**
 
-<video src="https://github.com/user-attachments/assets/e6734f63-9a03-47ec-bb62-d7b27ba33716" controls width="100%"></video>
+<img src="https://github.com/user-attachments/assets/e6734f63-9a03-47ec-bb62-d7b27ba33716" width="100%" alt="Overview">
 
 <!-- Video 2: Setup & Configuration -->
 **2. Creating and configuring a view**
