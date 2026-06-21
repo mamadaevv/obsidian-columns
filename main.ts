@@ -527,14 +527,8 @@ class ColumnsView extends BasesView {
       const labelEl = chip.createDiv({ cls: "columns-card-chip-label" });
       labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
       if (val == null || val instanceof NullValue) {
-        // file.backlinks, file.embeds, file.outlinks — show count
-        if (parsed?.name === "backlinks" || parsed?.name === "embeds" || parsed?.name === "outlinks") {
-          const span = chip.createSpan({ cls: "columns-chip-text" });
-          span.textContent = "0";
-        } else {
-          const dash = chip.createSpan({ cls: "columns-chip-text" });
-          dash.textContent = "–";
-        }
+        const dash = chip.createSpan({ cls: "columns-chip-text" });
+        dash.textContent = "–";
       } else {
         // file.backlinks, file.embeds, file.outlinks — each link on its own line
         if (parsed?.name === "backlinks" || parsed?.name === "embeds" || parsed?.name === "outlinks") {
