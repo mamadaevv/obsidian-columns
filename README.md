@@ -39,7 +39,10 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
    - **Right-click** a tag → toggle AND mode: now multiple tags require ALL to match
    - Click the **OR/AND** button to switch mode
    - Click **All** → clear all filters
-5. Open the **gear menu** (⚙) to configure appearance: title style, property chips, date format, layout
+5. **Open a card**:
+   - **Left-click** → open note (mode set in gear menu: tab / active pane / modal)
+   - **Ctrl+Click** → open note in a background tab
+6. Open the **gear menu** (⚙) to configure appearance: title style, property chips, date format, layout
 
 ## Settings (gear menu)
 
