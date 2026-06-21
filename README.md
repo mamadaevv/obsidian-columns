@@ -12,12 +12,12 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 <!-- Video 2: Setup & Configuration -->
 **2. Creating and configuring a view**
 
-<video src="https://github.com/user-attachments/assets/1d23aa39-235a-45a7-89a6-e65174823a7e" controls width="100%"></video>
+[![View configure](https://github.com/user-attachments/assets/1d23aa39-235a-45a7-89a6-e65174823a7e)](https://github.com/user-attachments/assets/1d23aa39-235a-45a7-89a6-e65174823a7e)
 
 <!-- Video 3: Filtering -->
 **3. Tag filtering & column navigation**
 
-<video src="https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79" controls width="100%"></video>
+[![Filter use](https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79)](https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79)
 
 ## Features
 
