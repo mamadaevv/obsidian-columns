@@ -10,11 +10,11 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 
 <!-- Video 2: Setup & Configuration -->
 **2. Creating and configuring a view**
-[![View configure cover](https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/view%20configure.webp)](https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/view%20configure.webm)
+<video src="https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/view%20configure.webm" controls poster="https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/view%20configure.webp" width="100%"></video>
 
 <!-- Video 3: Filtering -->
 **3. Tag filtering & column navigation**
-[![Filter use cover](https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/filter%20use.webp)](https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/filter%20use.webm)
+<video src="https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/filter%20use.webm" controls poster="https://raw.githubusercontent.com/mamadaevv/obsidian-columns/main/filter%20use.webp" width="100%"></video>
 
 ## Features
 
