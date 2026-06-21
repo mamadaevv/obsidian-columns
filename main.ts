@@ -736,6 +736,20 @@ class FilePreviewModal extends Modal {
     this.app.vault.read(this.file).then((text) => {
       MarkdownRenderer.render(this.app, text, contentDiv, this.file.path, this);
     });
+
+    // Open internal links in a new modal
+    contentDiv.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const linkEl = target.closest("a.internal-link");
+      if (!linkEl) return;
+      e.preventDefault();
+      const href = linkEl.getAttribute("href");
+      if (!href) return;
+      const resolved = this.app.metadataCache.getFirstLinkpathDest(href, this.file.path);
+      if (resolved && resolved instanceof TFile) {
+        new FilePreviewModal(this.app, resolved).open();
+      }
+    });
   }
 
   onClose(): void {

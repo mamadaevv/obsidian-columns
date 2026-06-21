@@ -575,7 +575,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
   }
 };
-var FilePreviewModal = class extends import_obsidian.Modal {
+var FilePreviewModal = class _FilePreviewModal extends import_obsidian.Modal {
   constructor(app, file) {
     super(app);
     this.file = file;
@@ -597,6 +597,18 @@ var FilePreviewModal = class extends import_obsidian.Modal {
     });
     this.app.vault.read(this.file).then((text) => {
       import_obsidian.MarkdownRenderer.render(this.app, text, contentDiv, this.file.path, this);
+    });
+    contentDiv.addEventListener("click", (e) => {
+      const target = e.target;
+      const linkEl = target.closest("a.internal-link");
+      if (!linkEl) return;
+      e.preventDefault();
+      const href = linkEl.getAttribute("href");
+      if (!href) return;
+      const resolved = this.app.metadataCache.getFirstLinkpathDest(href, this.file.path);
+      if (resolved && resolved instanceof import_obsidian.TFile) {
+        new _FilePreviewModal(this.app, resolved).open();
+      }
     });
   }
   onClose() {
