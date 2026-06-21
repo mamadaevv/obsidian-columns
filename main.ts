@@ -147,7 +147,7 @@ class ColumnsView extends BasesView {
           {
             key: CFG_TITLE_FONT_SIZE,
             type: "slider",
-            displayName: "Title font size (px)",
+            displayName: "Font size (px)",
             default: 14,
             min: 11,
             max: 20,
@@ -162,7 +162,7 @@ class ColumnsView extends BasesView {
           {
             key: CFG_CHIP_GRID,
             type: "dropdown",
-            displayName: "Chip layout",
+            displayName: "Layout",
             default: "stack",
             options: {
               stack: "Stack",
@@ -178,7 +178,7 @@ class ColumnsView extends BasesView {
           {
             key: CFG_CHIP_FONT_SIZE,
             type: "slider",
-            displayName: "Chip font size (px)",
+            displayName: "Font size (px)",
             default: 12,
             min: 9,
             max: 18,
