@@ -721,6 +721,16 @@ class FilePreviewModal extends Modal {
 
     contentEl.createEl("h2", { text: this.file.basename });
 
+    const openBtn = contentEl.createEl("button", {
+      cls: "mod-cta",
+      text: "Open note",
+    });
+    openBtn.style.margin = "0 20px 8px";
+    openBtn.addEventListener("click", () => {
+      this.app.workspace.getLeaf(true).openFile(this.file);
+      this.close();
+    });
+
     const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
 
     this.app.vault.read(this.file).then((text) => {
