@@ -340,6 +340,7 @@
 
 .columns-modal-content {
   padding: 0;
+  user-select: text;
 }
 
 .columns-modal-content h2 {
