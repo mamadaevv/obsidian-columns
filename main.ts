@@ -750,6 +750,7 @@ class FilePreviewModal extends Modal {
       if (!href) return;
       const resolved = this.app.metadataCache.getFirstLinkpathDest(href, this.file.path);
       if (resolved && resolved instanceof TFile) {
+        this.close();
         new FilePreviewModal(this.app, resolved).open();
       }
     });

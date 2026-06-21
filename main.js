@@ -610,6 +610,7 @@ var FilePreviewModal = class _FilePreviewModal extends import_obsidian.Modal {
       if (!href) return;
       const resolved = this.app.metadataCache.getFirstLinkpathDest(href, this.file.path);
       if (resolved && resolved instanceof import_obsidian.TFile) {
+        this.close();
         new _FilePreviewModal(this.app, resolved).open();
       }
     });
