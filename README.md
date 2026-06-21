@@ -16,7 +16,8 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 
 <!-- Video 3: Filtering -->
 **3. Tag filtering & column navigation**
-[Filter use demo](https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79)
+
+<video src="https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79" controls width="100%"></video>
 
 ## Features
 
