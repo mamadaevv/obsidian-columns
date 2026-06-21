@@ -448,7 +448,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
               const raw = item.toString();
               const m = raw.match(/^\[\[([^|\]]+)(?:\|([^\]]+))?\]\]$/);
               const target = m ? m[1] : raw;
-              const linkEl = chip.createEl("a", { cls: "columns-chip-link" });
+              const linkEl = chip.createEl("a", { cls: "columns-chip-link-block" });
               linkEl.textContent = m ? m[2] || target.split("/").pop()?.replace(/\.md$/, "") || raw : raw;
               linkEl.addEventListener("click", (e) => {
                 e.stopPropagation();
