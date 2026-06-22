@@ -7,17 +7,17 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 <!-- Video 1: Overview -->
 **1. Overview**
 
-![Overview](https://github.com/user-attachments/assets/a9bfbb83-79d8-40c0-bc68-7e43bcdc1953)
+![Overview](https://raw.githubusercontent.com/mamadaevv/card-columns/main/images/overview.webp)
 
 <!-- Video 2: Setup & Configuration -->
 **2. Creating and configuring a view**
 
-[![View configure](https://github.com/user-attachments/assets/1d23aa39-235a-45a7-89a6-e65174823a7e)](https://github.com/user-attachments/assets/1d23aa39-235a-45a7-89a6-e65174823a7e)
+[![View configure](https://raw.githubusercontent.com/mamadaevv/card-columns/main/images/view%20configure.webp)](https://raw.githubusercontent.com/mamadaevv/card-columns/main/images/view%20configure.webm)
 
 <!-- Video 3: Filtering -->
 **3. Tag filtering & column navigation**
 
-[![Filter use](https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79)](https://github.com/user-attachments/assets/d2981eb9-b13a-425e-abab-9324cd0c5f79)
+[![Filter use](https://raw.githubusercontent.com/mamadaevv/card-columns/main/images/filter%20use.webp)](https://raw.githubusercontent.com/mamadaevv/card-columns/main/images/filter%20use.webm)
 
 ## Features
 
