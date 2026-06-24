@@ -138,7 +138,18 @@
 }
 
 /* ---------------------------------------------------------------------------
-  Card list (scrollable vertical area inside column)
+  Cards scroll wrapper (multi-column) — keeps header outside scroll area
+  --------------------------------------------------------------------------- */
+
+.columns-cards-scroll {
+  flex: 1;
+  overflow-y: overlay;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------------------
+  Card list (scrollable vertical area inside column — single column mode,
+  or grid inside scroll wrapper for multi-column)
   --------------------------------------------------------------------------- */
 
 .columns-cards {
@@ -149,20 +160,6 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-}
-
-/* Multi-column mode: overlay scrollbar so it doesn't steal grid width */
-.columns-column.is-multi-column {
-  overflow-y: overlay;
-}
-
-.columns-column.is-multi-column .columns-column-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--background-secondary);
-  overflow: clip;
-  isolation: isolate;
 }
 
 .columns-column.is-multi-column .columns-cards {

@@ -498,7 +498,6 @@ class ColumnsView extends BasesView {
     const colWidth = cardWidth * actualCols + gapTotal + paddingOverhead;
     if (columnsPerGroup > 1) {
       colEl.classList.add("is-multi-column");
-      // No flexBasis — column auto-sizes to grid content
       colEl.style.maxWidth = colWidth + "px";
     } else {
       colEl.style.flexBasis = colWidth + "px";
@@ -511,10 +510,15 @@ class ColumnsView extends BasesView {
     const countSpan = headerEl.createSpan({ cls: "columns-column-count" });
     countSpan.textContent = String(entries.length);
 
-    const cardsEl = colEl.createDiv({ cls: "columns-cards" });
+    let cardsEl: HTMLElement;
     if (columnsPerGroup > 1) {
+      // Scroll wrapper keeps header outside the scroll container
+      const scrollWrapper = colEl.createDiv({ cls: "columns-cards-scroll" });
+      cardsEl = scrollWrapper.createDiv({ cls: "columns-cards" });
       cardsEl.classList.add("is-multi-column");
       cardsEl.style.gridTemplateColumns = `repeat(${actualCols}, ${cardWidth}px)`;
+    } else {
+      cardsEl = colEl.createDiv({ cls: "columns-cards" });
     }
 
     for (const entry of entries) {

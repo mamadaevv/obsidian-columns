@@ -425,10 +425,14 @@ var ColumnsView = class extends import_obsidian.BasesView {
     titleSpan.textContent = name;
     const countSpan = headerEl.createSpan({ cls: "columns-column-count" });
     countSpan.textContent = String(entries.length);
-    const cardsEl = colEl.createDiv({ cls: "columns-cards" });
+    let cardsEl;
     if (columnsPerGroup > 1) {
+      const scrollWrapper = colEl.createDiv({ cls: "columns-cards-scroll" });
+      cardsEl = scrollWrapper.createDiv({ cls: "columns-cards" });
       cardsEl.classList.add("is-multi-column");
       cardsEl.style.gridTemplateColumns = `repeat(${actualCols}, ${cardWidth}px)`;
+    } else {
+      cardsEl = colEl.createDiv({ cls: "columns-cards" });
     }
     for (const entry of entries) {
       this.renderCard(cardsEl, entry, visibleProps);
