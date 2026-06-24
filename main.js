@@ -408,10 +408,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
   //  Column & Card
   // -----------------------------------------------------------------------
   renderColumn(boardEl, name, entries, width, visibleProps, columnsPerGroup) {
-    const colWidth = width * columnsPerGroup;
     const colEl = boardEl.createDiv({ cls: "columns-column" });
-    colEl.style.flexBasis = colWidth + "px";
-    colEl.style.maxWidth = colWidth + "px";
+    colEl.style.flexBasis = width + "px";
+    colEl.style.maxWidth = width + "px";
     const headerEl = colEl.createDiv({ cls: "columns-column-header" });
     const titleSpan = headerEl.createSpan({ cls: "columns-column-title" });
     titleSpan.textContent = name;
