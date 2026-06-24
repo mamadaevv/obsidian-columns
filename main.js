@@ -37,6 +37,7 @@ var CFG_TITLE_FONT_SIZE = "titleFontSize";
 var CFG_WRAP_VALUES = "wrapValues";
 var CFG_FILTER_HEIGHT = "filterHeight";
 var CFG_COLUMNS_PER_GROUP = "columnsPerGroup";
+var CFG_ZEBRA_STRIPING = "zebraStriping";
 var ColumnsPlugin = class extends import_obsidian.Plugin {
   async onload() {
     this.registerBasesView("columns", {
@@ -112,6 +113,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
             min: 1,
             max: 6,
             step: 1
+          },
+          {
+            key: CFG_ZEBRA_STRIPING,
+            type: "toggle",
+            displayName: "Zebra striping (alternate column background)",
+            default: false
           }
         ]
       },
@@ -306,7 +313,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     const cardWidth = this.getCardWidth();
     const visibleProps = this.getVisiblePropertyIds();
     const boardEl = this.containerEl.createDiv({ cls: "columns-board" });
-    for (const colName of colNames) {
+    const isZebra = this.cfg(CFG_ZEBRA_STRIPING, false);
+    for (let colIdx = 0; colIdx < colNames.length; colIdx++) {
+      const colName = colNames[colIdx];
       let colEntries;
       if (colName === "(No value)") {
         const paths = noValueEntries.map((e) => e.file?.path ?? "");
@@ -324,7 +333,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
       }
       const columnsPerGroup = this.cfg(CFG_COLUMNS_PER_GROUP, 1);
       if (colEntries.length === 0) continue;
-      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup);
+      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup, isZebra, colIdx);
     }
   }
   // -----------------------------------------------------------------------
@@ -407,7 +416,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
   // -----------------------------------------------------------------------
   //  Column & Card
   // -----------------------------------------------------------------------
-  renderColumn(boardEl, name, entries, cardWidth, visibleProps, columnsPerGroup) {
+  renderColumn(boardEl, name, entries, cardWidth, visibleProps, columnsPerGroup, isZebra, colIdx) {
     const actualCols = Math.min(entries.length, columnsPerGroup);
     const colEl = boardEl.createDiv({ cls: "columns-column" });
     const gapTotal = (actualCols - 1) * 12;
@@ -420,6 +429,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
     } else {
       colEl.style.flexBasis = colWidth + "px";
       colEl.style.maxWidth = colWidth + "px";
+    }
+    if (isZebra && colIdx % 2 === 0) {
+      colEl.classList.add("is-zebra-even");
     }
     const headerEl = colEl.createDiv({ cls: "columns-column-header" });
     const titleSpan = headerEl.createSpan({ cls: "columns-column-title" });

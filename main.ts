@@ -38,6 +38,7 @@ const CFG_TITLE_FONT_SIZE = "titleFontSize";
 const CFG_WRAP_VALUES = "wrapValues";
 const CFG_FILTER_HEIGHT = "filterHeight";
 const CFG_COLUMNS_PER_GROUP = "columnsPerGroup";
+const CFG_ZEBRA_STRIPING = "zebraStriping";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -139,6 +140,12 @@ class ColumnsView extends BasesView {
             min: 1,
             max: 6,
             step: 1,
+          },
+          {
+            key: CFG_ZEBRA_STRIPING,
+            type: "toggle",
+            displayName: "Zebra striping (alternate column background)",
+            default: false,
           },
         ],
       },
@@ -363,8 +370,10 @@ class ColumnsView extends BasesView {
     const cardWidth = this.getCardWidth();
     const visibleProps = this.getVisiblePropertyIds();
     const boardEl = this.containerEl.createDiv({ cls: "columns-board" });
+    const isZebra = this.cfg<boolean>(CFG_ZEBRA_STRIPING, false);
 
-    for (const colName of colNames) {
+    for (let colIdx = 0; colIdx < colNames.length; colIdx++) {
+      const colName = colNames[colIdx];
       let colEntries: BasesEntry[];
       if (colName === "(No value)") {
         const paths = noValueEntries.map((e) => e.file?.path ?? "");
@@ -385,7 +394,7 @@ class ColumnsView extends BasesView {
 
       if (colEntries.length === 0) continue;
 
-      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup);
+      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup, isZebra, colIdx);
     }
   }
 
@@ -490,6 +499,8 @@ class ColumnsView extends BasesView {
     cardWidth: number,
     visibleProps: string[],
     columnsPerGroup: number,
+    isZebra: boolean,
+    colIdx: number,
   ): void {
     const actualCols = Math.min(entries.length, columnsPerGroup);
     const colEl = boardEl.createDiv({ cls: "columns-column" });
@@ -503,6 +514,10 @@ class ColumnsView extends BasesView {
     } else {
       colEl.style.flexBasis = colWidth + "px";
       colEl.style.maxWidth = colWidth + "px";
+    }
+
+    if (isZebra && colIdx % 2 === 0) {
+      colEl.classList.add("is-zebra-even");
     }
 
     const headerEl = colEl.createDiv({ cls: "columns-column-header" });
