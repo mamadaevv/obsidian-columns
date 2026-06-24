@@ -66,6 +66,7 @@ class ColumnsView extends BasesView {
 
   activeFilters: Set<string> = new Set();
   andMode = false;
+  splitLeaf: WorkspaceLeaf | null = null;
 
   constructor(
     controller: QueryController,
@@ -110,11 +111,12 @@ class ColumnsView extends BasesView {
             key: CFG_OPEN_BEHAVIOR,
             type: "dropdown",
             displayName: "Open card in",
-            default: "tab",
+            default: "split-right",
             options: {
               active: "Active pane",
               modal: "Floating modal",
               tab: "New tab",
+              "split-right": "Split right",
             },
           },
           {
@@ -243,8 +245,8 @@ class ColumnsView extends BasesView {
   }
 
   private getOpenBehavior(): string {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "tab");
-    return ["active", "modal", "tab"].includes(v) ? v : "tab";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "split-right");
+    return ["active", "modal", "tab", "split-right"].includes(v) ? v : "split-right";
   }
 
   /** Collect column values from a file's frontmatter. */
@@ -564,9 +566,17 @@ class ColumnsView extends BasesView {
 
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
-        // Ctrl+click — open in background tab
-        const leaf = this.app.workspace.getLeaf(true);
-        leaf.openFile(file);
+        // Ctrl+click — open in background
+        const behavior = this.getOpenBehavior();
+        if (behavior === "split-right") {
+          // Create a new split leaf (don't reuse the tracked one)
+          const leaf = this.app.workspace.getLeaf("split", "vertical");
+          leaf.openFile(file);
+          this.app.workspace.setActiveLeaf(leaf, { focus: false });
+        } else {
+          const leaf = this.app.workspace.getLeaf(true);
+          leaf.openFile(file);
+        }
       } else {
         this.openFile(file);
       }
@@ -701,6 +711,24 @@ class ColumnsView extends BasesView {
         this.app.workspace.getLeaf(true).openFile(file);
         break;
       }
+      case "split-right": {
+        this.openInSplit(file);
+        break;
+      }
+    }
+  }
+
+  private openInSplit(file: TFile): void {
+    // Check if existing split leaf is still alive
+    if (this.splitLeaf && this.splitLeaf.view) {
+      // Reuse existing split leaf
+      this.splitLeaf.openFile(file);
+      this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
+    } else {
+      // Create new split leaf to the right
+      this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
+      this.splitLeaf.openFile(file);
+      this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
     }
   }
 }

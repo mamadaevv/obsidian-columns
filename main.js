@@ -52,6 +52,7 @@ var ColumnsView = class extends import_obsidian.BasesView {
     this.type = "columns";
     this.activeFilters = /* @__PURE__ */ new Set();
     this.andMode = false;
+    this.splitLeaf = null;
     this.scrollEl = scrollEl;
     this.plugin = plugin;
     this.containerEl = scrollEl.createDiv({ cls: "columns-container" });
@@ -83,11 +84,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
             key: CFG_OPEN_BEHAVIOR,
             type: "dropdown",
             displayName: "Open card in",
-            default: "tab",
+            default: "split-right",
             options: {
               active: "Active pane",
               modal: "Floating modal",
-              tab: "New tab"
+              tab: "New tab",
+              "split-right": "Split right"
             }
           },
           {
@@ -208,8 +210,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     return v >= 150 && v <= 700 ? v : 300;
   }
   getOpenBehavior() {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "tab");
-    return ["active", "modal", "tab"].includes(v) ? v : "tab";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "split-right");
+    return ["active", "modal", "tab", "split-right"].includes(v) ? v : "split-right";
   }
   /** Collect column values from a file's frontmatter. */
   getColumnValues(file, prop) {
@@ -462,8 +464,15 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
-        const leaf = this.app.workspace.getLeaf(true);
-        leaf.openFile(file);
+        const behavior = this.getOpenBehavior();
+        if (behavior === "split-right") {
+          const leaf = this.app.workspace.getLeaf("split", "vertical");
+          leaf.openFile(file);
+          this.app.workspace.setActiveLeaf(leaf, { focus: false });
+        } else {
+          const leaf = this.app.workspace.getLeaf(true);
+          leaf.openFile(file);
+        }
       } else {
         this.openFile(file);
       }
@@ -575,6 +584,20 @@ var ColumnsView = class extends import_obsidian.BasesView {
         this.app.workspace.getLeaf(true).openFile(file);
         break;
       }
+      case "split-right": {
+        this.openInSplit(file);
+        break;
+      }
+    }
+  }
+  openInSplit(file) {
+    if (this.splitLeaf && this.splitLeaf.view) {
+      this.splitLeaf.openFile(file);
+      this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
+    } else {
+      this.splitLeaf = this.app.workspace.getLeaf("split", "vertical");
+      this.splitLeaf.openFile(file);
+      this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
     }
   }
 };
