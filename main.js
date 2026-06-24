@@ -409,7 +409,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
   // -----------------------------------------------------------------------
   renderColumn(boardEl, name, entries, cardWidth, visibleProps, columnsPerGroup) {
     const actualCols = Math.min(entries.length, columnsPerGroup);
-    const colWidth = cardWidth * actualCols;
+    const gapTotal = (actualCols - 1) * 12;
+    const paddingOverhead = 40;
+    const colWidth = cardWidth * actualCols + gapTotal + paddingOverhead;
     const colEl = boardEl.createDiv({ cls: "columns-column" });
     colEl.style.flexBasis = colWidth + "px";
     colEl.style.maxWidth = colWidth + "px";
