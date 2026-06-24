@@ -1,6 +1,6 @@
 # Columns
 
-A kanban-style card view for Obsidian. Group notes by tags or any frontmatter property into columns, with tag filtering and property chips.
+A kanban-style card view for Obsidian. Group notes by tags or any frontmatter property into columns, with tag filtering, property chips, and split‑pane preview.
 
 ## Demo
 
@@ -26,7 +26,8 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 ## Features
 
 - **Column grouping** — group by `tags`, `status`, `category` or any frontmatter property
-- **Tag filtering** — click tags to AND/OR filter across columns
+- **Split‑pane preview** — open cards in a right or bottom split pane; LMB reuses the pane, Ctrl+LMB opens a new tab
+- **Tag filtering** — click tags to AND/OR filter across columns; Ctrl+Click toggles a single tag
 - **Property chips** — view note properties as styled chips (text, tags, links, booleans, dates)
 - **Date formatting** — Moment.js format and locale support
 - **Grid/Stack layout** — compact inline properties or structured vertical layout
@@ -40,18 +41,22 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 4. Filter by clicking tag pills below the toolbar:
    - **Left-click** on a tag → show only notes with that tag (clears other filters)
    - **Left-click another tag** → show notes matching ANY selected tag (OR mode)
-   - **Ctrl+Click** or **Right-click** on a tag → toggle that tag without clearing others (add/remove single tag)
+   - **Ctrl+Click** or **Right-click** on a tag → toggle that tag without clearing others
    - Click the **OR/AND** button → switch between OR and AND mode for multiple tags
    - Click **All** → clear all filters
-5. **Open a card**:
-   - **Left-click** → open note (mode set in gear menu: tab / active pane / modal)
-   - **Ctrl+Click** → open note in a background tab
+5. **Open a card** — mode depends on the gear‑menu setting:
+   - **Active pane** — opens in the current leaf
+   - **Floating modal** — preview in a pop‑up (default)
+   - **New tab** — opens in a new tab
+   - **Split right / Split down** — opens in a split pane:
+     - **Left-click** → replaces the file in the existing split pane
+     - **Ctrl+Click** → opens a new tab inside the split pane
 6. Open the **gear menu** (⚙) to configure appearance: title style, property chips, date format, layout
 
 ## Settings (gear menu)
 
 ### General
-- Open card in (active pane / floating modal / new tab)
+- Open card in (active pane / floating modal / new tab / split right / split down)
 - Column width (px)
 
 ### Title
@@ -70,7 +75,7 @@ A kanban-style card view for Obsidian. Group notes by tags or any frontmatter pr
 ## Installation
 
 1. Download from Obsidian community plugins (pending)
-2. Or manual: copy `main.js`, `manifest.json`, `styles.css` to `obsidian-columns/` in your vault's `.obsidian/plugins/`
+2. Or manual: copy `main.js`, `manifest.json`, `styles.css` to `card-columns/` in your vault's `.obsidian/plugins/`
 
 ## Support
 
