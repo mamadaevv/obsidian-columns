@@ -465,10 +465,16 @@ var ColumnsView = class extends import_obsidian.BasesView {
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
         const behavior = this.getOpenBehavior();
-        if (behavior === "split-right" && this.splitLeaf && this.splitLeaf.view) {
-          this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
-          const leaf = this.app.workspace.getLeaf(true);
-          leaf.openFile(file);
+        if (behavior === "split-right") {
+          const leafAlive = this.splitLeaf?.view != null && this.splitLeaf.parent != null;
+          if (leafAlive) {
+            this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
+            const leaf = this.app.workspace.getLeaf(true);
+            leaf.openFile(file);
+          } else {
+            const leaf = this.app.workspace.getLeaf(true);
+            leaf.openFile(file);
+          }
         } else {
           const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);
@@ -591,7 +597,13 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
   }
   openInSplit(file) {
-    if (this.splitLeaf && this.splitLeaf.view) {
+    let found = false;
+    if (this.splitLeaf?.view) {
+      this.app.workspace.iterateAllLeaves((l) => {
+        if (l === this.splitLeaf) found = true;
+      });
+    }
+    if (found) {
       this.splitLeaf.openFile(file);
       this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
     } else {

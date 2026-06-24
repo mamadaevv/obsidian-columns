@@ -568,11 +568,19 @@ class ColumnsView extends BasesView {
       if (e.ctrlKey || e.metaKey) {
         // Ctrl+click — open in background
         const behavior = this.getOpenBehavior();
-        if (behavior === "split-right" && this.splitLeaf && this.splitLeaf.view) {
-          // Open in a new tab inside the existing split leaf
-          this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
-          const leaf = this.app.workspace.getLeaf(true);
-          leaf.openFile(file);
+        if (behavior === "split-right") {
+          // Check if split leaf is alive first
+          const leafAlive = this.splitLeaf?.view != null && this.splitLeaf.parent != null;
+          if (leafAlive) {
+            // Open in a new tab inside the existing split leaf
+            this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
+            const leaf = this.app.workspace.getLeaf(true);
+            leaf.openFile(file);
+          } else {
+            // Split gone — fall back to new tab
+            const leaf = this.app.workspace.getLeaf(true);
+            leaf.openFile(file);
+          }
         } else {
           const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);
@@ -719,8 +727,15 @@ class ColumnsView extends BasesView {
   }
 
   private openInSplit(file: TFile): void {
-    // Check if existing split leaf is still alive
-    if (this.splitLeaf && this.splitLeaf.view) {
+    // Check if existing split leaf is still alive — must have a view AND be in the workspace
+    let found = false;
+    if (this.splitLeaf?.view) {
+      this.app.workspace.iterateAllLeaves((l) => {
+        if (l === this.splitLeaf) found = true;
+      });
+    }
+
+    if (found) {
       // Reuse existing split leaf
       this.splitLeaf.openFile(file);
       this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: true });
