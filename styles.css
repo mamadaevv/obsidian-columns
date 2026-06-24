@@ -151,13 +151,17 @@
   min-height: 0;
 }
 
-/* Multi-column grid inside a column */
-.columns-cards.is-multi-column {
+/* Multi-column mode: overlay scrollbar so it doesn't steal grid width */
+.columns-column.is-multi-column {
+  overflow-y: overlay;
+}
+
+.columns-column.is-multi-column .columns-cards {
+  overflow-y: visible;
+  flex: 1;
   display: grid;
   grid-auto-rows: max-content;
   gap: 12px;
-  overflow-y: auto;
-  flex: 1;
 }
 
 /* ---------------------------------------------------------------------------
