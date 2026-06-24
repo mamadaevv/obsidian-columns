@@ -568,11 +568,11 @@ class ColumnsView extends BasesView {
       if (e.ctrlKey || e.metaKey) {
         // Ctrl+click — open in background
         const behavior = this.getOpenBehavior();
-        if (behavior === "split-right") {
-          // Create a new split leaf (don't reuse the tracked one)
-          const leaf = this.app.workspace.getLeaf("split", "vertical");
+        if (behavior === "split-right" && this.splitLeaf && this.splitLeaf.view) {
+          // Open in a new tab inside the existing split leaf
+          this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
+          const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);
-          this.app.workspace.setActiveLeaf(leaf, { focus: false });
         } else {
           const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);

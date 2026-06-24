@@ -465,10 +465,10 @@ var ColumnsView = class extends import_obsidian.BasesView {
     cardEl.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
         const behavior = this.getOpenBehavior();
-        if (behavior === "split-right") {
-          const leaf = this.app.workspace.getLeaf("split", "vertical");
+        if (behavior === "split-right" && this.splitLeaf && this.splitLeaf.view) {
+          this.app.workspace.setActiveLeaf(this.splitLeaf, { focus: false });
+          const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);
-          this.app.workspace.setActiveLeaf(leaf, { focus: false });
         } else {
           const leaf = this.app.workspace.getLeaf(true);
           leaf.openFile(file);
