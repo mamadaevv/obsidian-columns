@@ -172,6 +172,21 @@
 }
 
 /* ---------------------------------------------------------------------------
+  Masonry — CSS columns instead of grid
+  --------------------------------------------------------------------------- */
+
+.columns-column.is-multi-column .columns-cards.is-masonry {
+  display: block;
+  grid-template-columns: none;
+}
+
+.columns-column.is-multi-column .columns-cards.is-masonry .columns-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 12px;
+}
+
+/* ---------------------------------------------------------------------------
   Zebra striping
   --------------------------------------------------------------------------- */
 

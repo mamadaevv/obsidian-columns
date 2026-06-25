@@ -39,6 +39,7 @@ const CFG_WRAP_VALUES = "wrapValues";
 const CFG_FILTER_HEIGHT = "filterHeight";
 const CFG_COLUMNS_PER_GROUP = "columnsPerGroup";
 const CFG_ZEBRA_STRIPING = "zebraStriping";
+const CFG_MASONRY = "masonry";
 
 // ---------------------------------------------------------------------------
 //  Plugin
@@ -145,6 +146,12 @@ class ColumnsView extends BasesView {
             key: CFG_ZEBRA_STRIPING,
             type: "toggle",
             displayName: "Zebra striping (alternate column background)",
+            default: false,
+          },
+          {
+            key: CFG_MASONRY,
+            type: "toggle",
+            displayName: "Masonry layout (cards fill gaps vertically)",
             default: false,
           },
         ],
@@ -371,6 +378,7 @@ class ColumnsView extends BasesView {
     const visibleProps = this.getVisiblePropertyIds();
     const boardEl = this.containerEl.createDiv({ cls: "columns-board" });
     const isZebra = this.cfg<boolean>(CFG_ZEBRA_STRIPING, false);
+    const isMasonry = this.cfg<boolean>(CFG_MASONRY, false);
 
     for (let colIdx = 0; colIdx < colNames.length; colIdx++) {
       const colName = colNames[colIdx];
@@ -394,7 +402,7 @@ class ColumnsView extends BasesView {
 
       if (colEntries.length === 0) continue;
 
-      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup, isZebra, colIdx);
+      this.renderColumn(boardEl, colName, colEntries, cardWidth, visibleProps, columnsPerGroup, isZebra, colIdx, isMasonry);
     }
   }
 
@@ -501,6 +509,7 @@ class ColumnsView extends BasesView {
     columnsPerGroup: number,
     isZebra: boolean,
     colIdx: number,
+    isMasonry: boolean,
   ): void {
     const actualCols = Math.min(entries.length, columnsPerGroup);
     const colEl = boardEl.createDiv({ cls: "columns-column" });
@@ -532,7 +541,13 @@ class ColumnsView extends BasesView {
       const scrollWrapper = colEl.createDiv({ cls: "columns-cards-scroll" });
       cardsEl = scrollWrapper.createDiv({ cls: "columns-cards" });
       cardsEl.classList.add("is-multi-column");
-      cardsEl.style.gridTemplateColumns = `repeat(${actualCols}, ${cardWidth}px)`;
+      if (isMasonry && actualCols > 1) {
+        cardsEl.classList.add("is-masonry");
+        cardsEl.style.columnCount = String(actualCols);
+        cardsEl.style.columnGap = "12px";
+      } else {
+        cardsEl.style.gridTemplateColumns = `repeat(${actualCols}, ${cardWidth}px)`;
+      }
     } else {
       cardsEl = colEl.createDiv({ cls: "columns-cards" });
     }
