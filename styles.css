@@ -250,6 +250,7 @@
 }
 .columns-card-cover.is-borderless.is-after-all {
   margin-top: 8px;
+  margin-bottom: -8px;
   border-radius: 0 0 6px 6px;
 }
 
