@@ -212,7 +212,6 @@
   flex-direction: column;
   gap: 0;
   min-width: 0;
-  overflow: hidden;
 }
 
 .columns-card:hover {
@@ -230,12 +229,13 @@
 
 .columns-card-cover {
   overflow: hidden;
+  position: relative;
 }
 
-/* Borderless: bleed to card edges */
+/* Borderless: bleed to card edges — extends past border */
 .columns-card-cover.is-borderless {
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -11px;
+  margin-right: -11px;
   border-radius: 0;
 }
 .columns-card-cover.is-borderless.is-above-title {
