@@ -240,8 +240,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
             key: CFG_COVER_ASPECT,
             type: "dropdown",
             displayName: "Aspect ratio",
-            default: "4:3",
+            default: "auto",
             options: {
+              auto: "Auto (natural ratio)",
               "1:1": "1:1",
               "3:2": "3:2",
               "4:3": "4:3",
@@ -591,14 +592,22 @@ var ColumnsView = class extends import_obsidian.BasesView {
     }
     if (hasCover) {
       const coverStyle = this.cfg(CFG_COVER_STYLE, "borderless");
-      const coverAspect = this.cfg(CFG_COVER_ASPECT, "4:3");
+      const coverAspect = this.cfg(CFG_COVER_ASPECT, "auto");
       const coverOrientation = this.cfg(CFG_COVER_ORIENTATION, "landscape");
       const coverFit = this.cfg(CFG_COVER_FIT, "cover");
       coverEl = cardEl.createDiv({ cls: "columns-card-cover" });
       coverEl.classList.add(`is-${coverStyle}`);
-      coverEl.classList.add(`is-${coverOrientation}`);
-      const [w, h] = coverAspect.split(":").map(Number);
-      coverEl.style.aspectRatio = `${w} / ${h}`;
+      if (coverAspect === "auto") {
+        coverEl.classList.add("is-auto");
+      } else {
+        coverEl.classList.add(`is-${coverOrientation}`);
+        const [w, h] = coverAspect.split(":").map(Number);
+        if (coverOrientation === "portrait") {
+          coverEl.style.aspectRatio = `${h} / ${w}`;
+        } else {
+          coverEl.style.aspectRatio = `${w} / ${h}`;
+        }
+      }
       if (coverUrl) {
         const img = coverEl.createEl("img", { cls: "columns-card-cover-img" });
         img.src = coverUrl;
