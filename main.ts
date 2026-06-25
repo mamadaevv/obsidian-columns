@@ -743,17 +743,18 @@ class ColumnsView extends BasesView {
         coverEl.classList.add("is-placeholder");
       }
 
-      // If cover is the only element (no title, no chips), make it full card
+      // If cover is the only element (no title, no chips), mark as cover-only
       if (visibleProps.length === 0) {
         cardEl.classList.add("is-cover-only");
       }
     }
 
-    // Title
+    // Title — always shown unless cover-only mode
+    const isCoverOnly = hasCover && visibleProps.length === 0;
     let titleEl: HTMLElement | null = null;
     let chipsEl: HTMLElement | null = null;
 
-    if (visibleProps.length > 0) {
+    if (!isCoverOnly) {
       const titlePropId = this.getTitlePropertyId();
       const title = titlePropId
         ? entry.getValue(titlePropId as any)?.toString() ?? file.name
@@ -764,9 +765,11 @@ class ColumnsView extends BasesView {
       titleEl.style.setProperty("--title-fs", this.cfg(CFG_TITLE_FONT_SIZE, 14) + "px");
       titleEl.textContent = title;
       const coverPosition = this.cfg<string>(CFG_COVER_POSITION, "above-title");
-      if (coverPosition !== "below-title") titleEl.style.marginBottom = "16px";
+      if (visibleProps.length > 0 && coverPosition !== "below-title") titleEl.style.marginBottom = "16px";
+    }
 
-      // Visible property chips
+    // Visible property chips
+    if (visibleProps.length > 0) {
     const isGrid = this.cfg(CFG_CHIP_GRID, "stack") === "grid";
     const chipFontSize = this.cfg(CFG_CHIP_FONT_SIZE, 12);
     const wrapValues = this.cfg(CFG_WRAP_VALUES, true);
