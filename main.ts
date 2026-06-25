@@ -1042,38 +1042,53 @@ class FilePreviewModal extends Modal {
     contentEl.empty();
     contentEl.addClass("columns-modal-content");
 
-    contentEl.createEl("h2", { text: this.file.basename });
+    const file = this.file;
 
-    const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
+    // Handle non-md files (images, etc.)
+    if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(file.path)) {
+      const img = contentEl.createEl("img", { cls: "columns-modal-img" });
+      img.src = this.app.vault.getResourcePath(file);
+      img.style.maxWidth = "100%";
+      img.style.display = "block";
+      img.style.margin = "0 auto";
+    } else if (!file.path.endsWith(".md")) {
+      // Non-md, non-image — show basic info
+      contentEl.createEl("p", { text: "Cannot preview this file type." });
+    } else {
+      // Markdown file — full rendering
+      contentEl.createEl("h2", { text: file.basename });
 
-    const footer = contentEl.createDiv({ cls: "modal-footer" });
-    const openBtn = footer.createEl("button", {
-      cls: "mod-cta",
-      text: "Open",
-    });
-    openBtn.addEventListener("click", () => {
-      this.app.workspace.getLeaf(true).openFile(this.file);
-      this.close();
-    });
+      const contentDiv = contentEl.createDiv({ cls: "columns-modal-body" });
 
-    this.app.vault.read(this.file).then((text) => {
-      MarkdownRenderer.render(this.app, text, contentDiv, this.file.path, this);
-    });
-
-    // Open internal links in a new modal
-    contentDiv.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      const linkEl = target.closest("a.internal-link");
-      if (!linkEl) return;
-      e.preventDefault();
-      const href = linkEl.getAttribute("href");
-      if (!href) return;
-      const resolved = this.app.metadataCache.getFirstLinkpathDest(href, this.file.path);
-      if (resolved && resolved instanceof TFile) {
+      const footer = contentEl.createDiv({ cls: "modal-footer" });
+      const openBtn = footer.createEl("button", {
+        cls: "mod-cta",
+        text: "Open",
+      });
+      openBtn.addEventListener("click", () => {
+        this.app.workspace.getLeaf(true).openFile(file);
         this.close();
-        new FilePreviewModal(this.app, resolved).open();
-      }
-    });
+      });
+
+      this.app.vault.read(file).then((text) => {
+        MarkdownRenderer.render(this.app, text, contentDiv, file.path, this);
+      });
+
+      // Open internal links in a new modal
+      contentDiv.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const linkEl = target.closest("a.internal-link");
+        if (!linkEl) return;
+        e.preventDefault();
+        const href = linkEl.getAttribute("href");
+        if (!href) return;
+        const resolved = this.app.metadataCache.getFirstLinkpathDest(href, file.path);
+        if (resolved && resolved instanceof TFile) {
+          this.close();
+          new FilePreviewModal(this.app, resolved).open();
+        }
+      });
+    }
   }
 
   onClose(): void {
