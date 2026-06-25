@@ -743,14 +743,15 @@ class ColumnsView extends BasesView {
         coverEl.classList.add("is-placeholder");
       }
 
-      // If cover is the only element (no title, no chips), mark as cover-only
-      if (visibleProps.length === 0) {
+      // If cover is the only element (no properties at all), mark as cover-only
+      const orderLen = (this.config?.getOrder() ?? []).length;
+      if (orderLen === 0) {
         cardEl.classList.add("is-cover-only");
       }
     }
 
     // Title — always shown unless cover-only mode
-    const isCoverOnly = hasCover && visibleProps.length === 0;
+    const isCoverOnly = hasCover && (this.config?.getOrder() ?? []).length === 0;
     let titleEl: HTMLElement | null = null;
     let chipsEl: HTMLElement | null = null;
 

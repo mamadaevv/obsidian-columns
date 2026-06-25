@@ -620,11 +620,12 @@ var ColumnsView = class extends import_obsidian.BasesView {
       } else {
         coverEl.classList.add("is-placeholder");
       }
-      if (visibleProps.length === 0) {
+      const orderLen = (this.config?.getOrder() ?? []).length;
+      if (orderLen === 0) {
         cardEl.classList.add("is-cover-only");
       }
     }
-    const isCoverOnly = hasCover && visibleProps.length === 0;
+    const isCoverOnly = hasCover && (this.config?.getOrder() ?? []).length === 0;
     let titleEl = null;
     let chipsEl = null;
     if (!isCoverOnly) {
