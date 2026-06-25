@@ -343,6 +343,9 @@ var ColumnsView = class extends import_obsidian.BasesView {
   getCoverUrl(file) {
     const src = this.cfg(CFG_COVER_SOURCE, "none");
     if (src === "none") return null;
+    if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(file.path)) {
+      return this.app.vault.getResourcePath(file);
+    }
     const cache = this.app.metadataCache.getFileCache(file);
     if (!cache) return null;
     let coverPath = null;

@@ -386,6 +386,11 @@ class ColumnsView extends BasesView {
     const src = this.cfg<string>(CFG_COVER_SOURCE, "none");
     if (src === "none") return null;
 
+    // If the file itself is an image, it IS the cover
+    if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(file.path)) {
+      return this.app.vault.getResourcePath(file);
+    }
+
     const cache = this.app.metadataCache.getFileCache(file);
     if (!cache) return null;
 
