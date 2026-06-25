@@ -313,8 +313,8 @@ var ColumnsView = class extends import_obsidian.BasesView {
     return v >= 150 && v <= 700 ? v : 300;
   }
   getOpenBehavior() {
-    const v = this.cfg(CFG_OPEN_BEHAVIOR, "split-right");
-    return ["active", "modal", "tab", "split-right", "split-down"].includes(v) ? v : "split-right";
+    const v = this.cfg(CFG_OPEN_BEHAVIOR, "modal");
+    return ["active", "modal", "tab", "split-right", "split-down"].includes(v) ? v : "modal";
   }
   /** Collect column values from a file's frontmatter. */
   getColumnValues(file, prop) {
